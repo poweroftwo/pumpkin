@@ -41,20 +41,20 @@ void CACLTargetCombo::SetOp(int op)
 	switch(op) {
 	case tftp::opRRQ:
 		m_tmap.RemoveAll();
-		SetItemData(m_tmap[acl_rule::rrqNone]=AddString("fallback to global"),acl_rule::rrqNone);
-		SetItemData(m_tmap[acl_rule::rrqDeny]=AddString("deny access"),acl_rule::rrqDeny);
-		SetItemData(m_tmap[acl_rule::rrqPrompt]=AddString("prompt"),acl_rule::rrqPrompt);
-		SetItemData(m_tmap[acl_rule::rrqGrant]=AddString("grant access"),CPumpKINDlg::rrqGrant);
+		SetItemData(m_tmap[acl_rule::rrqNone]=AddString(_T("fallback to global")),acl_rule::rrqNone);
+		SetItemData(m_tmap[acl_rule::rrqDeny]=AddString(_T("deny access")),acl_rule::rrqDeny);
+		SetItemData(m_tmap[acl_rule::rrqPrompt]=AddString(_T("prompt")),acl_rule::rrqPrompt);
+		SetItemData(m_tmap[acl_rule::rrqGrant]=AddString(_T("grant access")),CPumpKINDlg::rrqGrant);
 		SetCurSel(0);
 		EnableWindow(TRUE);
 		break;
 	case tftp::opWRQ:
 		m_tmap.RemoveAll();
-		SetItemData(m_tmap[acl_rule::wrqNone]=AddString("fallback to global"),acl_rule::wrqNone);
-		SetItemData(m_tmap[acl_rule::wrqDeny]=AddString("deny access"),acl_rule::wrqDeny);
-		SetItemData(m_tmap[acl_rule::wrqPrompt]=AddString("prompt"),acl_rule::wrqPrompt);
-		SetItemData(m_tmap[acl_rule::wrqPromptIfExists]=AddString("prompt if file exists"),acl_rule::wrqPromptIfExists);
-		SetItemData(m_tmap[acl_rule::wrqGrant]=AddString("grant access"),acl_rule::wrqGrant);
+		SetItemData(m_tmap[acl_rule::wrqNone]=AddString(_T("fallback to global")),acl_rule::wrqNone);
+		SetItemData(m_tmap[acl_rule::wrqDeny]=AddString(_T("deny access")),acl_rule::wrqDeny);
+		SetItemData(m_tmap[acl_rule::wrqPrompt]=AddString(_T("prompt")),acl_rule::wrqPrompt);
+		SetItemData(m_tmap[acl_rule::wrqPromptIfExists]=AddString(_T("prompt if file exists")),acl_rule::wrqPromptIfExists);
+		SetItemData(m_tmap[acl_rule::wrqGrant]=AddString(_T("grant access")),acl_rule::wrqGrant);
 		SetCurSel(0);
 		EnableWindow(TRUE);
 		break;

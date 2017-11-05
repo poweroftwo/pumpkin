@@ -97,10 +97,10 @@ CPumpKINDlg::CPumpKINDlg(CWnd* pParent /*=NULL*/)
 	m_bShown=TRUE;
 	m_bExiting=FALSE;
 	m_BlockSize=2048;
-	m_bnw.AssignSound("(bang)",IDR_WAVE_RING,CBellsNWhistles::CBang::bangResource);
-	m_bnw.AssignSound("(done)",IDR_WAVE_FINISHED,CBellsNWhistles::CBang::bangResource);
-	m_bnw.AssignSound("(oops)",IDR_WAVE_ABORTED,CBellsNWhistles::CBang::bangResource);
-	m_bnw.AssignSound("(none)",(int)0,CBellsNWhistles::CBang::bangNone);
+	m_bnw.AssignSound(LPCTSTR("(bang)"),IDR_WAVE_RING,CBellsNWhistles::CBang::bangResource);
+	m_bnw.AssignSound(LPCTSTR("(done)"),IDR_WAVE_FINISHED,CBellsNWhistles::CBang::bangResource);
+	m_bnw.AssignSound(LPCTSTR("(oops)"),IDR_WAVE_ABORTED,CBellsNWhistles::CBang::bangResource);
+	m_bnw.AssignSound(LPCTSTR("(none)"),(UINT)0,CBellsNWhistles::CBang::bangNone);
 	m_bnwRequest="(bang)"; m_bnwSuccess="(done)";
 	m_bnwAbort="(oops)";
 	//{{AFX_DATA_INIT(CPumpKINDlg)
@@ -205,7 +205,7 @@ BOOL CPumpKINDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	VERIFY(m_Retrier->Create(NULL,"PumpKIN-Retrier",WS_CHILD,CRect(0,0,0,0),this,0));
+	VERIFY(m_Retrier->Create(NULL,LPCTSTR("PumpKIN-Retrier"),WS_CHILD,CRect(0,0,0,0),this,0));
 
 	m_Images.Create(16,16,TRUE,2,1);
 	m_iRRQ = m_Images.Add(AfxGetApp()->LoadIcon(IDI_RRQ));
@@ -220,11 +220,11 @@ BOOL CPumpKINDlg::OnInitDialog()
 	m_List.SetBkColor(RGB(12,167,0));	// Green
 CRect listrc;
 	m_List.GetClientRect(&listrc);
-	m_List.InsertColumn(0,"File",LVCFMT_LEFT,listrc.Width()-((listrc.Width()/7)*3+listrc.Width()*2/7),subitemFile);
-	m_List.InsertColumn(1,"type",LVCFMT_CENTER,listrc.Width()/7,subitemType);
-	m_List.InsertColumn(2,"peer",LVCFMT_LEFT,listrc.Width()*2/7,subitemPeer);
-	m_List.InsertColumn(3,"ACK",LVCFMT_RIGHT,listrc.Width()/7,subitemBytes);
-	m_List.InsertColumn(4,"tsize",LVCFMT_RIGHT,listrc.Width()/7,subitemTSize);
+	m_List.InsertColumn(0,_T("File"),LVCFMT_LEFT,listrc.Width()-((listrc.Width()/7)*3+listrc.Width()*2/7),subitemFile);
+	m_List.InsertColumn(1,_T("type"),LVCFMT_CENTER,listrc.Width()/7,subitemType);
+	m_List.InsertColumn(2,_T("peer"),LVCFMT_LEFT,listrc.Width()*2/7,subitemPeer);
+	m_List.InsertColumn(3,_T("ACK"),LVCFMT_RIGHT,listrc.Width()/7,subitemBytes);
+	m_List.InsertColumn(4,_T("tsize"),LVCFMT_RIGHT,listrc.Width()/7,subitemTSize);
 
 	LogLine(IDS_LOG_START);
 
@@ -369,7 +369,7 @@ int CPumpKINDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		AfxMessageBox(IDS_BOX_CANTBIND,MB_OK|MB_ICONEXCLAMATION);
 	}
 
-	if(!m_Trayer->Create(NULL,"PumpKIN TrayIcon",WS_CHILD,CRect(0,0,0,0),this,0)){
+	if(!m_Trayer->Create(NULL,LPCTSTR("PumpKIN TrayIcon"),WS_CHILD,CRect(0,0,0,0),this,0)){
 		TRACE0("Failed to create trayer\n");
 		return -1;
 	}
@@ -383,7 +383,7 @@ NOTIFYICONDATA nid;
 	nid.uCallbackMessage=WM_TRAYICON;
 	nid.hIcon=AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	// *** Load from resource
-	strcpy(nid.szTip,"PumpKIN");
+	strcpy_s((char*)nid.szTip, sizeof nid.szTip, "PumpKIN");
 	VERIFY(Shell_NotifyIcon(NIM_ADD,&nid));
 
 	return 0;
@@ -407,9 +407,10 @@ SOCKADDR_IN sin;
 		return;
 	}
 #ifndef	NDEBUG
-CString tmp;
-	tmp.Format("%u - %s - %u\n",tftpRQ->Opcode(),inet_ntoa(sin.sin_addr),sin.sin_port);
-	TRACE0(tmp);
+    CString tmp;
+	tmp.Format(_T("%u - %s - %u\n"),tftpRQ->Opcode(),inet_ntoa(sin.sin_addr),sin.sin_port);
+    // XXX Biggs
+    //TRACE0(tmp);
 #endif
 POSITION p = m_Daddy->m_Xfers.GetStartPosition();
 	while(p){
@@ -648,7 +649,7 @@ int i = m_Daddy->m_List.FindItem(&lvf);
 	}
 	m_Daddy->m_List.SetItemText(i,CPumpKINDlg::subitemFile,m_FileName);
 	m_Daddy->m_List.SetItemText(i,CPumpKINDlg::subitemType,m_Type);
-	m_Daddy->m_List.SetItemText(i,CPumpKINDlg::subitemPeer,inet_ntoa(m_Peer.sin_addr));
+	m_Daddy->m_List.SetItemText(i,CPumpKINDlg::subitemPeer,LPCTSTR(inet_ntoa(m_Peer.sin_addr)));
 CString tmp;
 	tmp.Format(IDS_FMT_BYTES,GetACK());
 	m_Daddy->m_List.SetItemText(i,CPumpKINDlg::subitemBytes,tmp);
@@ -683,7 +684,7 @@ CXferSocket::CXferSocket(CPumpKINDlg *daddy,LPCTSTR fileName,LPCTSTR type,SOCKAD
 	state=stateNone;
 	ASSERT(daddy);
 	m_Daddy=daddy;
-	m_timeOut=m__timeOut=m_Daddy->m_TFTPTimeOut.GetTotalSeconds();
+	m_timeOut = m__timeOut = (UINT)m_Daddy->m_TFTPTimeOut.GetTotalSeconds();
 	if(sin){
 		m_Peer.sin_addr.s_addr=sin->sin_addr.s_addr;
 		m_Peer.sin_port=sin->sin_port;
@@ -736,7 +737,7 @@ CFileException e;
 		Deny(&e);
 		return TRUE;
 	}
-	m_xferSize=m_File.GetLength();	// *** HANDLE EXCEPTION
+	m_xferSize= (LONG)m_File.GetLength();	// *** HANDLE EXCEPTION
 	if(hostName){
 		m_HostName=hostName;
 	
@@ -748,7 +749,7 @@ CFileException e;
 	int at = inAddr.Find('@');
 		if(at>=0)
 			inAddr=inAddr.Mid(at+1);
-		if((m_Peer.sin_addr.s_addr=inet_addr((LPCTSTR)inAddr))==INADDR_NONE){
+		if((m_Peer.sin_addr.s_addr=inet_addr((const char*)LPCTSTR(inAddr)))==INADDR_NONE){
 			ASSERT(!m_wndResolver);
 			m_wndResolver = new CResolver(this);
 			ASSERT(m_wndResolver);
@@ -759,28 +760,28 @@ CFileException e;
 	}else{
 	tftp::tftpOptions o;
 	CString v;
-		if(m_Options.Lookup(tftpoBSize,v)){
-			m__blkSize=atoi(v);
+		if(m_Options.Lookup(LPCTSTR(tftpoBSize),v)){
+			m__blkSize=atoi((const char*)LPCTSTR(v));
 			if(m__blkSize){
 				m_blkSize=m__blkSize;
-				v.Format("%u",m_blkSize);
+				v.Format(_T("%u"),m_blkSize);
 				o[tftpoBSize]=v;
 			}
 		}
 		if(m_Options.Lookup(tftpoTSize,v)){
-			v.Format("%lu",m_xferSize);
+			v.Format(_T("%lu"),m_xferSize);
 			o[tftpoTSize]=v;
 		}
 		if(m_Options.Lookup(tftpoTOut,v)){
-			m__timeOut=atoi(v);
+			m__timeOut=atoi((const char*)LPCTSTR(v));
 			if(m__timeOut){
 				m_timeOut=m__timeOut;
-				v.Format("%u",m_timeOut);
+				v.Format(_T("%u"),m_timeOut);
 				o[tftpoTOut]=v;
 			}
 		}
 		// XXX: see if we can enforce our preference regarding block size here.
-		if(m_xferSize >= (m_blkSize<<16)) {
+		if(m_xferSize >= (LONG)(m_blkSize<<16)) {
 			Deny(tftp::errUndefined,IDS_TFTP_ERROR_TOOBIG);
 			return TRUE;
 		}
@@ -807,7 +808,7 @@ CRRQSocket::CRRQSocket(CPumpKINDlg *daddy,LPCTSTR fileName,LPCTSTR type,SOCKADDR
 
 UINT tftp::tftpERROR::tftpSize(LPCTSTR msg)
 {
-	return tftpHdrSize-tftpSlackSize+sizeof(tftp::tftpERROR::tftpErrorCode)+strlen(msg)+1;
+	return tftpHdrSize-tftpSlackSize+sizeof(tftp::tftpERROR::tftpErrorCode)+strlen((const char*)msg)+1;
 }
 
 tftp* tftp::Allocate(UINT tftpSize)
@@ -823,7 +824,7 @@ void tftp::errSet(UINT code,LPCTSTR msg)
 {
 	ASSERT(this);
 	ASSERT(length>=data.m_ERROR.tftpSize(msg));
-	strcpy((char*)data.m_ERROR.data,msg);
+	strcpy_s((char*)data.m_ERROR.data,sizeof data.m_ERROR.data, (const char*)msg);
 	data.m_ERROR.SetCode(code);
 }
 
@@ -859,7 +860,7 @@ tftp *p = tftp::Allocate(tftp::tftpDATA::tftpSize(m_blkSize));
 		p->length=p->length-m_blkSize+bytes;
 		m_LastSlack = m_blkSize-bytes;
 		PostTFTP(p);
-		if(bytes<m_blkSize){
+		if(bytes < (int)m_blkSize){
 			state=stateClosing; m_ACKtoClose = m_ACK+1;
 		}
 	}CATCH(CFileException,e){
@@ -943,7 +944,7 @@ BOOL rv = TRUE;
 			if(p->GetOptions(&o)){
 			CString v;
 				if(o.Lookup(tftpoBSize,v)){
-					m_blkSize=atoi(v);
+					m_blkSize=atoi((const char*)LPCTSTR(v));
 					if(!m_blkSize){	// *** More sanity checks
 						Deny(tftp::errOption,IDS_TFTP_ERROR_BSIZE);
 						rv = TRUE;
@@ -951,7 +952,7 @@ BOOL rv = TRUE;
 					}
 				}
 				if(o.Lookup(tftpoTOut,v)){
-					m_timeOut=atoi(v);
+					m_timeOut=atoi((const char*)LPCTSTR(v));
 					if(!m_timeOut){	// *** More sanity checks
 						Deny(tftp::errOption,IDS_TFTP_ERROR_TOUT);
 						rv = TRUE;
@@ -959,7 +960,7 @@ BOOL rv = TRUE;
 					}
 				}
 				if(o.Lookup(tftpoXResume,v)){
-					m_ACK=atoi(v);
+					m_ACK=atoi((const char*)LPCTSTR(v));
 				}
 			}
 			UpdateList();
@@ -1011,30 +1012,30 @@ BOOL CWRQSocket::OnTFTP(tftp* p)
 		ASSERT(state!=stateFinish);
 	{
 		if(m_bResume)
-			m_ACK=m_File.GetLength()/m_blkSize;
+			m_ACK=(UINT)m_File.GetLength()/m_blkSize;
 		else
 			m_ACK=0;
 	tftp::tftpOptions o;
 		if(p->GetOptions(&o)){
 		CString v;
 			if(o.Lookup(tftpoBSize,v)){
-				m_blkSize=atoi(v);
+				m_blkSize=atoi((const char*)LPCTSTR(v));
 				if(!m_blkSize){	// *** More sanity checks
 					Deny(tftp::errOption,IDS_TFTP_ERROR_BSIZE);
 					return TRUE;
 				}
 			}
 			if(o.Lookup(tftpoTOut,v)){
-				m_timeOut=atoi(v);
+				m_timeOut=atoi((const char*)LPCTSTR(v));
 				if(!m_timeOut){	// *** More sanity checks
 					Deny(tftp::errOption,IDS_TFTP_ERROR_TOUT);
 					return TRUE;
 				}
 			}
 			if(o.Lookup(tftpoTSize,v)){
-				m_xferSize=atoi(v);
+				m_xferSize=atoi((const char*)LPCTSTR(v));
 			}
-			if(m_xferSize>=0 && m_xferSize>=(m_blkSize<<16)) {
+			if(m_xferSize>=0 && m_xferSize>=(LONG)(m_blkSize<<16)) {
 				Deny(tftp::errUndefined,IDS_TFTP_ERROR_TOOBIG);
 				return TRUE;
 			}
@@ -1054,7 +1055,7 @@ BOOL CWRQSocket::OnTFTP(tftp* p)
 					// *** Move to the other place where we can do it not that often
 					m_File.SetLength(m_File.GetPosition());
 				}
-				if(bytes<m_blkSize){
+				if(bytes < (int)m_blkSize){
 					state=stateFinish;
 					ASSERT(m_Daddy);
 				CString tmp;
@@ -1230,7 +1231,7 @@ CPropsACL acl;
 	network.m_ListenPort=m_ListenPort;
 	network.m_ListenAddress=m_ListenAddress;
 	network.m_SpeakPort=m_SpeakPort;
-	network.m_TimeOut=m_TFTPTimeOut.GetTotalSeconds();
+	network.m_TimeOut= (UINT)m_TFTPTimeOut.GetTotalSeconds();
 	network.m_BlockSize=m_BlockSize;
 
 	sounds.m_Request = m_bnwRequest;
@@ -1307,7 +1308,7 @@ CString fn = localFile?ApplyRootGently(localFile):ApplyRoot(lf);
 			return TRUE;
 		}
 	BOOL exists;
-		if(!_access((LPCTSTR)fn,0))
+		if(!_access((const char*)(LPCTSTR)fn,0))
 			m_Rename=exists=TRUE;
 		else
 			m_Rename=exists=FALSE;
@@ -1373,7 +1374,7 @@ CFileException e;
 	int at = inAddr.Find('@');
 		if(at>=0)
 			inAddr=inAddr.Mid(at+1);
-		if((m_Peer.sin_addr.s_addr=inet_addr((LPCTSTR)inAddr))==INADDR_NONE){
+		if((m_Peer.sin_addr.s_addr=inet_addr((const char*)(LPCTSTR)inAddr))==INADDR_NONE){
 			ASSERT(!m_wndResolver);
 			m_wndResolver = new CResolver(this);
 			ASSERT(m_wndResolver);
@@ -1386,38 +1387,38 @@ CFileException e;
 CString v;
 tftp::tftpOptions oack;
 	if(m_Options.Lookup(tftpoTSize,v)){
-		m_xferSize=atol(v);
+		m_xferSize=atol((const char*)LPCTSTR(v));
 		if(!m_xferSize){
 			Deny(tftp::errOption,IDS_TFTP_ERROR_TSIZE);
 			return TRUE;
 		}
 	}
 	if(m_Options.Lookup(tftpoBSize,v)){
-		m_blkSize=atoi(v);
+		m_blkSize=atoi((const char*)LPCTSTR(v));
 		if(!m_blkSize){	//  *** Do more about sanity check
 			Deny(tftp::errOption,IDS_TFTP_ERROR_BSIZE);
 			return TRUE;
 		}
-		v.Format("%u",m_blkSize);
+		v.Format(_T("%u"),m_blkSize);
 		oack[tftpoBSize]=v;
 	}
 	if(m_Options.Lookup(tftpoTOut,v)){
-		m_timeOut=atoi(v);
+		m_timeOut=atoi((const char*)LPCTSTR(v));
 		if(!m_timeOut){	// *** Do more about sanity check
 			Deny(tftp::errOption,IDS_TFTP_ERROR_TOUT);
 			return TRUE;
 		}
-		v.Format("%u",m_timeOut);
+		v.Format(_T("%u"),m_timeOut);
 		oack[tftpoTOut]=v;
 	}
 	if(m_Options.Lookup(tftpoXResume,v) && m_bResume){
-		m_ACK=m_File.GetLength()/m_blkSize;
-		v.Format("%u",m_ACK);
+		m_ACK=(UINT)m_File.GetLength()/m_blkSize;
+		v.Format(_T("%u"),m_ACK);
 		oack[tftpoXResume]=v;
 	}else
 		m_ACK=0;
 	// XXX: see if we can negotiate the right block size somehow
-	if(m_xferSize>=0 && m_xferSize>=(m_blkSize<<16)) {
+	if(m_xferSize>=0 && m_xferSize>=(LONG)(m_blkSize<<16)) {
 		Deny(tftp::errUndefined,IDS_TFTP_ERROR_TOOBIG);
 		return TRUE;
 	}
@@ -1466,14 +1467,14 @@ CString renamed = fn;
 	if(fn[fn.GetLength()-1]==')'){
 	int op = fn.ReverseFind('(');
 		if(op>0 && fn[op-1]==' '){
-			if(fn.Mid(op+1,fn.GetLength()-op-2).SpanExcluding("0123456789").IsEmpty())
+			if(fn.Mid(op+1,fn.GetLength()-op-2).SpanExcluding(_T("0123456789")).IsEmpty())
 				renamed = renamed.Left(op-1);
 		}
 	}
 CString testFN;
 	for(UINT tmp=0;tmp<32768;tmp++){
-		testFN.Format("%s (%u)",(LPCTSTR)renamed,tmp);
-		if(!_access((LPCTSTR)testFN,0))
+		testFN.Format(_T("%s (%u)"),(LPCTSTR)renamed,tmp);
+		if(!_access((const char*)(LPCTSTR)testFN,0))
 			continue;
 		fn=testFN;
 		return TRUE;
@@ -1518,7 +1519,7 @@ void CXferSocket::ResetTimeout()
 	ASSERT(m_Daddy);
 	m_Daddy->m_Retrier->KillTimer(m_hSocket);
 	if(m_Retry)
-		m_Daddy->m_Retrier->SetTimer(m_hSocket,min(60,m_Daddy->m_RetryTimeOut.GetTotalSeconds())*1000,NULL);
+		m_Daddy->m_Retrier->SetTimer(m_hSocket,min(60,(UINT)m_Daddy->m_RetryTimeOut.GetTotalSeconds())*1000,NULL);
 	if(!m_bRetry){
 		m_Daddy->KillTimer(m_hSocket);
 		m_Daddy->SetTimer(m_hSocket,min(60,m_timeOut)*1000,NULL);
@@ -1669,15 +1670,15 @@ void CRRQSocket::OnHostKnown()
 tftp::tftpOptions o;
 CString v;
 	ASSERT(m_xferSize>=0);
-	v.Format("%lu",m_xferSize);
+	v.Format(_T("%lu"),m_xferSize);
 	o[tftpoTSize] = v;
 	ASSERT(m__blkSize);
-	v.Format("%u",m__blkSize);
+	v.Format(_T("%u"),m__blkSize);
 	o[tftpoBSize] = v;
 	ASSERT(m__timeOut);
-	v.Format("%u",m__timeOut);
+	v.Format(_T("%u"),m__timeOut);
 	o[tftpoTOut] = v;
-	o[tftpoXResume] = "0";
+	o[tftpoXResume] = _T("0");
 tftp	*p = tftp::Allocate(tftp::tftpWRQ::tftpSize(m_FileName,m_Type,&o));
 	ASSERT(p);
 	p->SetOpcode(tftp::opWRQ);
@@ -1689,7 +1690,7 @@ tftp	*p = tftp::Allocate(tftp::tftpWRQ::tftpSize(m_FileName,m_Type,&o));
 
 UINT tftp::tftpRQ::tftpSize(LPCTSTR file,LPCTSTR type,tftp::tftpOptions* ops)
 {
-UINT rv = tftpHdrSize-tftpSlackSize+strlen(file)+1+strlen(type)+1;
+UINT rv = tftpHdrSize-tftpSlackSize+strlen((const char *)file)+1+strlen((const char*)type)+1;
 	if(ops){
 	tftpOptions& o = *ops;
 	POSITION p = o.GetStartPosition();
@@ -1727,16 +1728,20 @@ void tftp::tftpRQ::Set(LPCTSTR file,LPCTSTR type,tftp::tftpOptions* ops)
 {
 	// MAY BE DANGEROUS!
 UINT ptr = 0;
-	strcpy((LPTSTR)&data[ptr],file); ptr+=strlen(file)+1;
-	strcpy((LPTSTR)&data[ptr],type); ptr+=strlen(type)+1;
+	strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)file); 
+    ptr+=strlen((const char*)file)+1;
+	strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)type); 
+    ptr+=strlen((const char*)type)+1;
 	if(ops){
 	tftpOptions& o = *ops;
 	POSITION p = o.GetStartPosition();
 		while(p){
 		CString n,v;
 			o.GetNextAssoc(p,n,v);
-			strcpy((LPTSTR)&data[ptr],(LPCTSTR)n); ptr+=n.GetLength()+1;
-			strcpy((LPTSTR)&data[ptr],(LPCTSTR)v); ptr+=v.GetLength()+1;
+			strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)n); 
+            ptr+=n.GetLength()+1;
+			strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)v); 
+            ptr+=v.GetLength()+1;
 		}
 	}
 }
@@ -1744,16 +1749,20 @@ void tftp::tftpRRQ::Set(LPCTSTR file,LPCTSTR type,tftp::tftpOptions* ops)
 {
 	// MAY BE DANGEROUS!
 UINT ptr = 0;
-	strcpy((LPTSTR)&data[ptr],file); ptr+=strlen(file)+1;
-	strcpy((LPTSTR)&data[ptr],type); ptr+=strlen(type)+1;
+	strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)file); 
+    ptr+=strlen((char*)file)+1;
+	strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)type);
+    ptr+=strlen((char*)type)+1;
 	if(ops){
 	tftpOptions& o = *ops;
 	POSITION p = o.GetStartPosition();
 		while(p){
 		CString n,v;
 			o.GetNextAssoc(p,n,v);
-			strcpy((LPTSTR)&data[ptr],(LPCTSTR)n); ptr+=n.GetLength()+1;
-			strcpy((LPTSTR)&data[ptr],(LPCTSTR)v); ptr+=v.GetLength()+1;
+			strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)n); 
+            ptr+=n.GetLength()+1;
+			strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)v); 
+            ptr+=v.GetLength()+1;
 		}
 	}
 }
@@ -1761,16 +1770,20 @@ void tftp::tftpWRQ::Set(LPCTSTR file,LPCTSTR type,tftp::tftpOptions* ops)
 {
 	// MAY BE DANGEROUS!
 UINT ptr = 0;
-	strcpy((LPTSTR)&data[ptr],file); ptr+=strlen(file)+1;
-	strcpy((LPTSTR)&data[ptr],type); ptr+=strlen(type)+1;
+	strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)file); 
+    ptr+=strlen((char*)file)+1;
+	strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)type); 
+    ptr+=strlen((char*)type)+1;
 	if(ops){
 	tftpOptions& o = *ops;
 	POSITION p = o.GetStartPosition();
 		while(p){
 		CString n,v;
 			o.GetNextAssoc(p,n,v);
-			strcpy((LPTSTR)&data[ptr],(LPCTSTR)n); ptr+=n.GetLength()+1;
-			strcpy((LPTSTR)&data[ptr],(LPCTSTR)v); ptr+=v.GetLength()+1;
+			strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)n); 
+            ptr+=n.GetLength()+1;
+			strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)v); 
+            ptr+=v.GetLength()+1;
 		}
 	}
 }
@@ -1783,8 +1796,10 @@ POSITION p = o.GetStartPosition();
 	while(p){
 	CString n,v;
 		o.GetNextAssoc(p,n,v);
-		strcpy((LPTSTR)&data[ptr],(LPCTSTR)n); ptr+=n.GetLength()+1;
-		strcpy((LPTSTR)&data[ptr],(LPCTSTR)v); ptr+=v.GetLength()+1;
+		strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)n); 
+        ptr+=n.GetLength()+1;
+		strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)v); 
+        ptr+=v.GetLength()+1;
 	}
 }
 
@@ -1800,13 +1815,13 @@ void CWRQSocket::OnHostKnown()
 	m_Peer.sin_port=htons(m_Daddy->m_SpeakPort);
 tftp::tftpOptions o;
 CString v;
-	o[tftpoTSize]="0";
+	o[tftpoTSize]=_T("0");
 	if(m__blkSize){
-		v.Format("%u",m__blkSize);
+		v.Format(_T("%u"),m__blkSize);
 		o[tftpoBSize]=v;
 	}
 	if(m__timeOut){
-		v.Format("%u",m__timeOut);
+		v.Format(_T("%u"),m__timeOut);
 		o[tftpoTOut]=v;
 	}
 tftp	*p = tftp::Allocate(tftp::tftpRRQ::tftpSize(m_FileName,m_Type,&o));
@@ -1871,24 +1886,24 @@ void CPumpKINDlg::LoadSettings()
 {
 CWinApp *app = AfxGetApp();
 	ASSERT(app);
-	m_bListen=app->GetProfileInt("TFTPSettings","Listen",m_bListen);
-	m_bnwRequest=app->GetProfileString("BellsNWhistles","Request",m_bnwRequest);
-	m_bnwSuccess=app->GetProfileString("BellsNWhistles","Success",m_bnwSuccess);
-	m_bnwAbort=app->GetProfileString("BellsNWhistles","Abort",m_bnwAbort);
-	m_bTFTPSubdirs=app->GetProfileInt("TFTPSettings","Subdirs",m_bTFTPSubdirs);
-	m_ListenPort=app->GetProfileInt("TFTPSettings","ListenPort",m_ListenPort);
-	m_ListenAddress=app->GetProfileString("TFTPSettings","ListenAddress",m_ListenAddress);
-	m_LogLength=app->GetProfileInt("UISettings","LogLength",m_LogLength);
-	m_PromptTimeOut=app->GetProfileInt("UISettings","PromptTimeout",m_PromptTimeOut);
-	m_RRQMode=app->GetProfileInt("TFTPSettings","RRQMode",m_RRQMode);
-	m_SpeakPort=app->GetProfileInt("TFTPSettings","SpeakPort",m_SpeakPort);
-	m_TFTPRoot=app->GetProfileString("TFTPSettings","TFTPRoot",m_TFTPRoot);
-	m_LogFile=app->GetProfileString("General","LogFile",m_LogFile);
-	m_TFTPTimeOut=CTimeSpan(app->GetProfileInt("TFTPSettings","TFTPTimeout",m_TFTPTimeOut.GetTotalSeconds()));
-	m_BlockSize=app->GetProfileInt("TFTPSettings","TFTPBlockSize",m_BlockSize);
-	m_RetryTimeOut=CTimeSpan(app->GetProfileInt("TFTPSettings","RetryTimeout",m_RetryTimeOut.GetTotalSeconds()));
-	m_WRQMode=app->GetProfileInt("TFTPSettings","WRQMode",m_WRQMode);
-	m_bShown=app->GetProfileInt("UISettings","Visble",m_bShown);
+	m_bListen=app->GetProfileInt(_T("TFTPSettings"),_T("Listen"),m_bListen);
+	m_bnwRequest=app->GetProfileString(_T("BellsNWhistles"),_T("Request"),m_bnwRequest);
+	m_bnwSuccess=app->GetProfileString(_T("BellsNWhistles"),_T("Success"),m_bnwSuccess);
+	m_bnwAbort=app->GetProfileString(_T("BellsNWhistles"),_T("Abort"),m_bnwAbort);
+	m_bTFTPSubdirs=app->GetProfileInt(_T("TFTPSettings"),_T("Subdirs"),m_bTFTPSubdirs);
+	m_ListenPort=app->GetProfileInt(_T("TFTPSettings"),_T("ListenPort"),m_ListenPort);
+	m_ListenAddress=app->GetProfileString(_T("TFTPSettings"),_T("ListenAddress"),m_ListenAddress);
+	m_LogLength=app->GetProfileInt(_T("UISettings"),_T("LogLength"),m_LogLength);
+	m_PromptTimeOut=app->GetProfileInt(_T("UISettings"),_T("PromptTimeout"),m_PromptTimeOut);
+	m_RRQMode=app->GetProfileInt(_T("TFTPSettings"),_T("RRQMode"),m_RRQMode);
+	m_SpeakPort=app->GetProfileInt(_T("TFTPSettings"),_T("SpeakPort"),m_SpeakPort);
+	m_TFTPRoot=app->GetProfileString(_T("TFTPSettings"),_T("TFTPRoot"),m_TFTPRoot);
+	m_LogFile=app->GetProfileString(_T("General"),_T("LogFile"),m_LogFile);
+	m_TFTPTimeOut=CTimeSpan(app->GetProfileInt(_T("TFTPSettings"),_T("TFTPTimeout"),(int)m_TFTPTimeOut.GetTotalSeconds()));
+	m_BlockSize=app->GetProfileInt(_T("TFTPSettings"),_T("TFTPBlockSize"),(int)m_BlockSize);
+	m_RetryTimeOut=CTimeSpan(app->GetProfileInt(_T("TFTPSettings"),_T("RetryTimeout"),(int)m_RetryTimeOut.GetTotalSeconds()));
+	m_WRQMode=app->GetProfileInt(_T("TFTPSettings"),_T("WRQMode"),(int)m_WRQMode);
+	m_bShown=app->GetProfileInt(_T("UISettings"),_T("Visble"),m_bShown);
 	if(m_TFTPRoot.IsEmpty()){
 	DWORD dL = ::GetCurrentDirectory(0,NULL);
 		VERIFY(::GetCurrentDirectory(dL,m_TFTPRoot.GetBuffer(dL)));
@@ -1902,24 +1917,24 @@ void CPumpKINDlg::SaveSettings()
 {
 CWinApp *app = AfxGetApp();
 	ASSERT(app);
-	app->WriteProfileInt("TFTPSettings","Listen",m_bListen);
-	app->WriteProfileString("BellsNWhistles","Request",m_bnwRequest);
-	app->WriteProfileString("BellsNWhistles","Success",m_bnwSuccess);
-	app->WriteProfileString("BellsNWhistles","Abort",m_bnwAbort);
-	app->WriteProfileInt("TFTPSettings","Subdirs",m_bTFTPSubdirs);
-	app->WriteProfileInt("TFTPSettings","ListenPort",m_ListenPort);
-	app->WriteProfileString("TFTPSettings","ListenAddress",m_ListenAddress);
-	app->WriteProfileInt("UISettings","LogLength",m_LogLength);
-	app->WriteProfileInt("UISettings","PromptTimeout",m_PromptTimeOut);
-	app->WriteProfileInt("TFTPSettings","RRQMode",m_RRQMode);
-	app->WriteProfileInt("TFTPSettings","SpeakPort",m_SpeakPort);
-	app->WriteProfileString("TFTPSettings","TFTPRoot",m_TFTPRoot);
-	app->WriteProfileString("General","LogFile",m_LogFile);
-	app->WriteProfileInt("TFTPSettings","TFTPTimeout",m_TFTPTimeOut.GetTotalSeconds());
-	app->WriteProfileInt("TFTPSettings","TFTPBlockSize",m_BlockSize);
-	app->WriteProfileInt("TFTPSettings","RetryTimeout",m_RetryTimeOut.GetTotalSeconds());
-	app->WriteProfileInt("TFTPSettings","WRQMode",m_WRQMode);
-	app->WriteProfileInt("UISettings","Visble",m_bShown);
+	app->WriteProfileInt(_T("TFTPSettings"),_T("Listen"),m_bListen);
+	app->WriteProfileString(_T("BellsNWhistles"),_T("Request"),m_bnwRequest);
+	app->WriteProfileString(_T("BellsNWhistles"),_T("Success"),m_bnwSuccess);
+	app->WriteProfileString(_T("BellsNWhistles"),_T("Abort"),m_bnwAbort);
+	app->WriteProfileInt(_T("TFTPSettings"),_T("Subdirs"),m_bTFTPSubdirs);
+	app->WriteProfileInt(_T("TFTPSettings"),_T("ListenPort"),m_ListenPort);
+	app->WriteProfileString(_T("TFTPSettings"),_T("ListenAddress"),m_ListenAddress);
+	app->WriteProfileInt(_T("UISettings"),_T("LogLength"),m_LogLength);
+	app->WriteProfileInt(_T("UISettings"),_T("PromptTimeout"),m_PromptTimeOut);
+	app->WriteProfileInt(_T("TFTPSettings"),_T("RRQMode"),m_RRQMode);
+	app->WriteProfileInt(_T("TFTPSettings"),_T("SpeakPort"),m_SpeakPort);
+	app->WriteProfileString(_T("TFTPSettings"),_T("TFTPRoot"),m_TFTPRoot);
+	app->WriteProfileString(_T("General"),_T("LogFile"),m_LogFile);
+	app->WriteProfileInt(_T("TFTPSettings"),_T("TFTPTimeout"),(int)m_TFTPTimeOut.GetTotalSeconds());
+	app->WriteProfileInt(_T("TFTPSettings"),_T("TFTPBlockSize"),(int)m_BlockSize);
+	app->WriteProfileInt(_T("TFTPSettings"),_T("RetryTimeout"),(int)m_RetryTimeOut.GetTotalSeconds());
+	app->WriteProfileInt(_T("TFTPSettings"),_T("WRQMode"),m_WRQMode);
+	app->WriteProfileInt(_T("UISettings"),_T("Visble"),m_bShown);
 	m_aclRules.SaveProfile(app);
 }
 
@@ -1943,7 +1958,7 @@ CString CXferSocket::ApplyRootGently(LPCTSTR fn)
 {
 CString f = fn;
 CString rv = f;
-	if((!f.IsEmpty()) && f[0]!='\\' && f.Find(":")<0 && f.Find("\\")<0)
+	if((!f.IsEmpty()) && f[0]!='\\' && f.Find(_T(":"))<0 && f.Find(_T("\\"))<0)
 		rv = ApplyRoot(f);
 	return rv;
 }
@@ -1953,9 +1968,9 @@ BOOL CXferSocket::CheckBadRelativeness(LPCTSTR file)
 CString tmp = file;
 	if(tmp.IsEmpty())
 		return FALSE;
-	if(tmp.Find("..")>=0)
+	if(tmp.Find(_T(".."))>=0)
 		return TRUE;
-	if(tmp.Find(":")>=0)
+	if(tmp.Find(_T(":"))>=0)
 		return TRUE;
 	if((!m_Daddy->m_bTFTPSubdirs) && m_FileName.Find('\\')>=0)
 		return TRUE;
@@ -1966,7 +1981,7 @@ void CAboutDlg::OnKlevernet()
 {
 CString url;
 	url.LoadString(IDS_KLEVERNET_URL);
-	ShellExecute(::GetDesktopWindow(),"open",url,NULL,NULL,SW_SHOWMAXIMIZED);
+	ShellExecute(::GetDesktopWindow(),_T("open"),url,NULL,NULL,SW_SHOWMAXIMIZED);
 }
 
 BOOL CPumpKINDlg::PreTranslateMessage(MSG* pMsg)

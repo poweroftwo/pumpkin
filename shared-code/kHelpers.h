@@ -45,7 +45,7 @@ namespace Klever {
 	inline UINT TokenizeString(CStringList& rv,LPCTSTR string,LPCTSTR delimiter) {
 	CString s = string;
 	int found;
-	int delength = strlen(delimiter);
+	int delength = strlen((const char*)delimiter);
 	int rvc = 0;
 		while((found=s.Find(delimiter))>=0){
 			rv.AddTail(s.Left(found));
@@ -115,8 +115,9 @@ namespace Klever {
 		list.RemoveAll();
 	CWinApp* app = AfxGetApp();
 		ASSERT(app);
-		for(int tmp=0;;tmp++){
-			n.Format("%d",tmp);
+        int tmp = 0;
+		for(;;tmp++){
+			n.Format(_T("%d"),tmp);
 		CString str = app->GetProfileString(section,n,NULL);
 			if(str.IsEmpty())
 				break;
@@ -129,18 +130,19 @@ namespace Klever {
 	CWinApp* app = AfxGetApp();
 		ASSERT(app);
 	POSITION p = list.GetHeadPosition();
-		for(int tmp=0;p;tmp++){
-			n.Format("%d",tmp);
+        int tmp = 0;
+		for(;p;tmp++){
+			n.Format(_T("%d"),tmp);
 			app->WriteProfileString(section,n,list.GetNext(p));
 		}
-		n.Format("%d",tmp);
+		n.Format(_T("%d"),tmp);
 		app->WriteProfileString(section,n,NULL);
 		return tmp;
 	}
 
 	inline BOOL WriteProfileString(LPCTSTR section,LPCTSTR entry,LPCTSTR str) {
 	CWinApp* app = AfxGetApp();
-		return app->WriteProfileBinary(section,entry,(LPBYTE)str,strlen(str)+1);
+		return app->WriteProfileBinary(section,entry,(LPBYTE)str,strlen((const char *)str)+1);
 	}
 	inline CString GetProfileString(LPCTSTR section,LPCTSTR entry,LPCTSTR defval) {
 	CWinApp* app = AfxGetApp();

@@ -44,8 +44,9 @@ BOOL CRegEx::Compile(LPCTSTR regex,int flags)
 #ifdef _DEBUG
 	if(m_Error){
 	CString tmp;
-		tmp.Format("RE: ParseError: %d\n",m_Error);
-		TRACE0(tmp);
+		tmp.Format(_T("RE: ParseError: %d\n"),m_Error);
+		// XXX Biggs
+        //TRACE0(tmp);
 	}
 //	DumpStrip(afxDump);
 #endif
@@ -72,7 +73,8 @@ BOOL CRegEx::Match(LPCTSTR src,int flags)
 	// Go ahead..
 int stripLen = m_Strip.GetSize();
 	m_mLastPos.SetSize(0);
-	for(int tmp=0;tmp<stripLen;tmp++)
+    int tmp = 0;
+	for(;tmp<stripLen;tmp++)
 		m_Strip[tmp].m_MatchData=0;
 LPCTSTR beginp = m_mBegin;
 LPCTSTR endp;
@@ -151,7 +153,7 @@ BOOL first=TRUE;
 int prevF, prevB;
 	for(;;){
 	int co = m_Strip.GetSize();
-		while(m_ParsePointer < m_Pattern.GetLength() && ((c=m_Pattern[m_ParsePointer])!='|') && c!=stop)
+		while(m_ParsePointer < m_Pattern.GetLength() && ((c=(UCHAR)m_Pattern[m_ParsePointer])!='|') && c!=(UCHAR)stop)
 			ParseEREexp();
 		if(m_Strip.GetSize()==co){
 			m_Error || (m_Error=regeEmpty);
@@ -182,7 +184,7 @@ int prevF, prevB;
 void CRegEx::ParseEREexp()
 {
 	ASSERT(m_ParsePointer < m_Pattern.GetLength());
-UCHAR c = m_Pattern[m_ParsePointer++];
+UCHAR c = (UCHAR)m_Pattern[m_ParsePointer++];
 int pos = m_Strip.GetSize();
 int subno;
 int count, count2;
@@ -251,7 +253,7 @@ BOOL wascaret=FALSE;
 				m_Error = regeEscape;
 			// ??? point to nuls?
 		}else{
-			c = m_Pattern[m_ParsePointer++];
+			c = (UCHAR)m_Pattern[m_ParsePointer++];
 			EmitOrdinary(c);
 		}
 		break;
@@ -269,7 +271,7 @@ BOOL wascaret=FALSE;
 	}
 	if(m_ParsePointer >= m_Pattern.GetLength())
 		return;
-	c = m_Pattern[m_ParsePointer];
+	c = (UCHAR)m_Pattern[m_ParsePointer];
 	// Call a '{' repetition if followed by a digit
 	if (!(c=='*' || c=='+' || c=='?' || ( c=='{' && (m_ParsePointer+1) < m_Pattern.GetLength() && isdigit(m_Pattern[m_ParsePointer+1])) ))
 		return; // No repetitor - done.
@@ -335,7 +337,7 @@ BOOL wascaret=FALSE;
 	}
 	if(m_ParsePointer >= m_Pattern.GetLength())
 		return;
-	c = m_Pattern[m_ParsePointer];
+	c = (UCHAR)m_Pattern[m_ParsePointer];
 	if(!(c=='*' || c=='+' || c=='?' || (c=='{' && (m_ParsePointer+1)<m_Pattern.GetLength() && isdigit(m_Pattern[m_ParsePointer+1]))))
 		return;
 	TRACE0("RE: Double repeater\n");
@@ -363,7 +365,7 @@ void CRegEx::EmitOrdinary(UCHAR c)
 		// Emit both cases
 	CString savePattern = m_Pattern;
 	int savePointer = m_ParsePointer;
-		m_Pattern=c;
+		m_Pattern=(char*)c;
 		m_Pattern+=']';
 		m_ParsePointer=0;
 		ParseBracket();
@@ -393,7 +395,7 @@ int CRegEx::ParseCount()
 BOOL nonEmpty=FALSE;
 int rv = 0;
 UCHAR c;
-	while(m_ParsePointer < m_Pattern.GetLength() && isdigit(c=m_Pattern[m_ParsePointer]) && rv <=255){
+	while(m_ParsePointer < m_Pattern.GetLength() && isdigit(c=(UCHAR)m_Pattern[m_ParsePointer]) && rv <=255){
 		rv = rv*10 + c-'0';
 		nonEmpty=TRUE;
 		m_ParsePointer++;
@@ -408,12 +410,12 @@ UCHAR c;
 void CRegEx::ParseBracket()
 {
 	// Dept. of truly sickening special case kludges
-	if((m_ParsePointer+5) < m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,6).Compare("[:<]]")){
+	if((m_ParsePointer+5) < m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,6).Compare(_T("[:<]]"))){
 		m_Error || m_Strip.Add(CSop(CSop::opBOW));
 		m_ParsePointer+=6;
 		return;
 	}
-	if((m_ParsePointer+5) < m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,6).Compare("[:>]]")){
+	if((m_ParsePointer+5) < m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,6).Compare(_T("[:>]]"))){
 		m_Error || m_Strip.Add(CSop(CSop::opEOW));
 		m_ParsePointer+=6;
 		return;
@@ -428,12 +430,12 @@ CSet cset;
 		switch(m_Pattern[m_ParsePointer]){
 		case ']':
 		case '-':
-			cset.Add(m_Pattern[m_ParsePointer]);
+			cset.Add((UCHAR)m_Pattern[m_ParsePointer]);
 			m_ParsePointer++;
 			break;
 		}
 	}
-	while(m_ParsePointer < m_Pattern.GetLength() && m_Pattern[m_ParsePointer]!=']' && !((m_ParsePointer+1)<m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare("-]")))
+	while(m_ParsePointer < m_Pattern.GetLength() && m_Pattern[m_ParsePointer]!=']' && !((m_ParsePointer+1)<m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare(_T("-]"))))
 		ParseBracketTerm(cset);
 	if(m_ParsePointer < m_Pattern.GetLength() && m_Pattern[m_ParsePointer]=='-'){
 		m_ParsePointer++;
@@ -533,7 +535,7 @@ UCHAR c;
 			m_Error || (m_Error=regeBracket);
 			// ??? point to nuls?
 		}
-		c = m_Pattern[m_ParsePointer];
+		c = (UCHAR)m_Pattern[m_ParsePointer];
 		if(c== '-' || c==']'){
 			m_Error || (m_Error=regeCType);
 			// ??? point to nuls?
@@ -543,7 +545,7 @@ UCHAR c;
 			m_Error || (m_Error=regeBracket);
 			// ??? point to nuls?
 		}
-		if((m_ParsePointer+1)>=m_Pattern.GetLength() || (m_Pattern.Mid(m_ParsePointer,2).Compare(":]"))){
+		if((m_ParsePointer+1)>=m_Pattern.GetLength() || (m_Pattern.Mid(m_ParsePointer,2).Compare(_T(":]")))){
 			m_Error || (m_Error=regeCType);
 			// ??? point to nuls?
 		}else
@@ -555,13 +557,13 @@ UCHAR c;
 			m_Error || (m_Error=regeBracket);
 			// ??? point to nuls?
 		}
-		c = m_Pattern[m_ParsePointer];
+		c = (UCHAR)m_Pattern[m_ParsePointer];
 		if(c== '-' || c==']'){
 			m_Error || (m_Error=regeCollate);
 			// ??? point to nuls?
 		}
 		ParseBracketEClass(cset);
-		if((m_ParsePointer+1)>=m_Pattern.GetLength() || (m_Pattern.Mid(m_ParsePointer,2).Compare("=]"))){
+		if((m_ParsePointer+1)>=m_Pattern.GetLength() || (m_Pattern.Mid(m_ParsePointer,2).Compare(_T("=]")))){
 			m_Error || (m_Error=regeCollate);
 			// ??? point to nuls?
 		}else
@@ -596,29 +598,29 @@ UCHAR c;
 void CRegEx::ParseBracketCClass(CSet& cset)
 {
 static struct	{
-	char *className;
-	char *classChars;
+	wchar_t *className;
+	wchar_t *classChars;
 }	cc[] = {
-	{"alnum","ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"},
-	{"alpha","ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"},
-	{"blank"," \t"},
-	{"cntrl","\007\b\t\n\v\f\r\1\2\3\4\5\6\16\17\20\21\22\23\24\25\26\27\30\31\32\33\34\35\36\37\177"},
-	{"digit","0123456789"},
-	{"graph","ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"},
-	{"lower","abcdefghijklmnopqrstuvwxyz"},
-	{"print","ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ "},
-	{"punct","!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"},
-	{"space","\t\n\v\f\r "},
-	{"upper","ABCDEFGHIJKLMNOPQRSTUVWXYZ"},
-	{"xdigit","0123456789ABCDEFabcdef"}
+	{_T("alnum"),_T("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")},
+	{_T("alpha"),_T("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")},
+	{_T("blank"),_T(" \t")},
+	{_T("cntrl"),_T("\007\b\t\n\v\f\r\1\2\3\4\5\6\16\17\20\21\22\23\24\25\26\27\30\31\32\33\34\35\36\37\177")},
+	{_T("digit"),_T("0123456789")},
+	{_T("graph"),_T("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")},
+	{_T("lower"),_T("abcdefghijklmnopqrstuvwxyz")},
+	{_T("print"),_T("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ")},
+	{_T("punct"),_T("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")},
+	{_T("space"),_T("\t\n\v\f\r ")},
+	{_T("upper"),_T("ABCDEFGHIJKLMNOPQRSTUVWXYZ")},
+	{_T("xdigit"),_T("0123456789ABCDEFabcdef")}
 };
 CString cclass;
 UCHAR c;
-	while(m_ParsePointer < m_Pattern.GetLength() && isalpha(c=m_Pattern[m_ParsePointer])){
+	while(m_ParsePointer < m_Pattern.GetLength() && isalpha(c=(UCHAR)m_Pattern[m_ParsePointer])){
 		cclass+=c;
 		m_ParsePointer++;
 	}
-char *classChars = NULL;
+wchar_t *classChars = NULL;
 	for(int tmp=0;tmp<(sizeof(cc)/sizeof(cc[0]));tmp++){
 		if(!cclass.CompareNoCase(cc[tmp].className)){
 			classChars=cc[tmp].classChars;
@@ -631,7 +633,7 @@ char *classChars = NULL;
 		return;
 	}
 	while(*classChars)
-		cset.Add(*(classChars++));
+		cset.Add((UCHAR)*(classChars++));
 	// --- multis
 }
 
@@ -643,11 +645,11 @@ void CRegEx::ParseBracketEClass(CSet& cset)
 UCHAR CRegEx::ParseBracketCollatingElement(UCHAR term)
 {
 static struct	{
-	char *entityName;
+	wchar_t *entityName;
 	char entity;
-}	cc[] = { {"NUL",'\0'},{"SOH",'\001'},{"STX",'\002'},{"ETX",'\003'},{"EOT",'\004'},{"ENQ",'\005'},{"ACK",'\006'},{"BEL",'\007'},{"alert",'\007'},{"BS",'\010'},{"backspace",'\b'},{"HT",'\011'},{"tab",'\t'},{"LF",'\012'},{"newline",'\n'},{"VT",'\013'},{"vertical-tab",'\v'},{"FF",'\014'},{"form-feed",'\f'},{"CR",'\015'},{"carriage-return",'\r'},{"SO",'\016'},{"SI",'\017'},{"DLE",'\020'},{"DC1",'\021'},{"DC2",'\022'},{"DC3",'\023'},{"DC4",'\024'},{"NAK",'\025'},{"SYN",'\026'},{"ETB",'\027'},{"CAN",'\030'},{"EM",'\031'},{"SUB",'\032'},{"ESC",'\033'},{"IS4",'\034'},{"FS",'\034'},{"IS3",'\035'},{"GS",'\035'},{"IS2",'\036'},{"RS",'\036'},{"IS1",'\037'},{"US",'\037'},{"space",' '},{"exclamation-mark",'!'},{"quotation-mark",'"'},{"number-sign",'#'},{"dollar-sign",'$'},{"percent-sign",'%'},{"ampersand",'&'},{"apostrophe",'\''},{"left-parenthesis",'('},{"right-parenthesis",')'},{"asterisk",'*'},{"plus-sign",'+'},{"comma",','},{"hyphen",'-'},{"hyphen-minus",'-'},{"period",'.'},{"full-stop",'.'},{"slash",'/'},{"solidus",'/'},{"zero",'0'},{"one",'1'},{"two",'2'},{"three",'3'},{"four",'4'},{"five",'5'},{"six",'6'},{"seven",'7'},{"eight",'8'},{"nine",'9'},{"colon",':'},{"semicolon",';'},{"less-than-sign",'<'},{"equals-sign",'='},{"greater-than-sign",'>'},{"question-mark",'?'},{"commercial-at",'@'},{"left-square-bracket",'['},{"backslash",'\\'},{"reverse-solidus",'\\'},{"right-square-bracket",']'},{"circumflex",'^'},{"circumflex-accent",'^'},{"underscore",'_'},{"low-line",'_'},{"grave-accent",'`'},{"left-brace",'{'},{"left-curly-bracket",'{'},{"vertical-line",'|'},{"right-brace",'}'},{"right-curly-bracket",'}'},{"tilde",'~'},{"DEL",'\177'} };
+}	cc[] = { {_T("NUL"),'\0'},{_T("SOH"),'\001'},{_T("STX"),'\002'},{_T("ETX"),'\003'},{_T("EOT"),'\004'},{_T("ENQ"),'\005'},{_T("ACK"),'\006'},{_T("BEL"),'\007'},{_T("alert"),'\007'},{_T("BS"),'\010'},{_T("backspace"),'\b'},{_T("HT"),'\011'},{_T("tab"),'\t'},{_T("LF"),'\012'},{_T("newline"),'\n'},{_T("VT"),'\013'},{_T("vertical-tab"),'\v'},{_T("FF"),'\014'},{_T("form-feed"),'\f'},{_T("CR"),'\015'},{_T("carriage-return"),'\r'},{_T("SO"),'\016'},{_T("SI"),'\017'},{_T("DLE"),'\020'},{_T("DC1"),'\021'},{_T("DC2"),'\022'},{_T("DC3"),'\023'},{_T("DC4"),'\024'},{_T("NAK"),'\025'},{_T("SYN"),'\026'},{_T("ETB"),'\027'},{_T("CAN"),'\030'},{_T("EM"),'\031'},{_T("SUB"),'\032'},{_T("ESC"),'\033'},{_T("IS4"),'\034'},{_T("FS"),'\034'},{_T("IS3"),'\035'},{_T("GS"),'\035'},{_T("IS2"),'\036'},{_T("RS"),'\036'},{_T("IS1"),'\037'},{_T("US"),'\037'},{_T("space"),' '},{_T("exclamation-mark"),'!'},{_T("quotation-mark"),'"'},{_T("number-sign"),'#'},{_T("dollar-sign"),'$'},{_T("percent-sign"),'%'},{_T("ampersand"),'&'},{_T("apostrophe"),'\''},{_T("left-parenthesis"),'('},{_T("right-parenthesis"),')'},{_T("asterisk"),'*'},{_T("plus-sign"),'+'},{_T("comma"),','},{_T("hyphen"),'-'},{_T("hyphen-minus"),'-'},{_T("period"),'.'},{_T("full-stop"),'.'},{_T("slash"),'/'},{_T("solidus"),'/'},{_T("zero"),'0'},{_T("one"),'1'},{_T("two"),'2'},{_T("three"),'3'},{_T("four"),'4'},{_T("five"),'5'},{_T("six"),'6'},{_T("seven"),'7'},{_T("eight"),'8'},{_T("nine"),'9'},{_T("colon"),':'},{_T("semicolon"),';'},{_T("less-than-sign"),'<'},{_T("equals-sign"),'='},{_T("greater-than-sign"),'>'},{_T("question-mark"),'?'},{_T("commercial-at"),'@'},{_T("left-square-bracket"),'['},{_T("backslash"),'\\'},{_T("reverse-solidus"),'\\'},{_T("right-square-bracket"),']'},{_T("circumflex"),'^'},{_T("circumflex-accent"),'^'},{_T("underscore"),'_'},{_T("low-line"),'_'},{_T("grave-accent"),'`'},{_T("left-brace"),'{'},{_T("left-curly-bracket"),'{'},{_T("vertical-line"),'|'},{_T("right-brace"),'}'},{_T("right-curly-bracket"),'}'},{_T("tilde"),'~'},{_T("DEL"),'\177'} };
 CString seeTwo;
-	seeTwo=term;
+	seeTwo=(char*)term;
 	seeTwo+=']';
 CString entityName;
 	while(m_ParsePointer<m_Pattern.GetLength() && !((m_ParsePointer+1)<m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare(seeTwo)))
@@ -661,7 +663,7 @@ CString entityName;
 		if(!entityName.CompareNoCase(cc[tmp].entityName))
 			return cc[tmp].entity;
 	if(entityName.GetLength()==1)
-		return entityName[0];
+		return (UCHAR)entityName[0];
 	m_Error || (m_Error=regeCollate);
 	// ??? point to nuls?
 	return 0;
@@ -673,13 +675,13 @@ UCHAR CRegEx::ParseBracketSymbol()
 		m_Error || (m_Error=regeBracket);
 		// ??? point to nuls?
 	}
-	if((m_ParsePointer+1)<m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare("[."))
+	if((m_ParsePointer+1)<m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare(_T("[.")))
 		m_ParsePointer+=2;
 	else
-		return m_Pattern[m_ParsePointer++];
+		return (UCHAR)m_Pattern[m_ParsePointer++];
 	// Collating symbol
 UCHAR rv = ParseBracketCollatingElement('.');
-	if((m_ParsePointer+1)<m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare("[."))
+	if((m_ParsePointer+1)<m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare(_T("[.")))
 		m_ParsePointer+=2;
 	else{
 		m_Error || (m_Error=regeCollate);
@@ -801,7 +803,8 @@ void CRegEx::FigureMust()
 int stripLen = m_Strip.GetSize();
 int seqStart, seqLength = 0;
 int mustStart, mustLength = 0;
-	for(int tmp=1;tmp<stripLen;tmp++){
+    int tmp = 1;
+	for(;tmp<stripLen;tmp++){
 		switch(m_Strip[tmp].m_Operator){
 		case CSop::opChar:
 			if(!seqLength)
@@ -840,7 +843,7 @@ int mustStart, mustLength = 0;
 	for(tmp=0;tmp<seqLength;tmp++){
 		while(m_Strip[seqStart+tmp].m_Operator!=CSop::opChar)
 			ASSERT(tmp<seqLength);
-		m_Must+=m_Strip[tmp].m_Operand;
+		m_Must+=(char*)m_Strip[tmp].m_Operand;
 	}
 }
 
@@ -875,7 +878,7 @@ void CRegEx::ParseLiteral()
 		// ??? point to nuls?
 	}
 	while(m_ParsePointer < m_Pattern.GetLength())
-		EmitOrdinary(m_Pattern[m_ParsePointer++]);
+		EmitOrdinary((UCHAR)m_Pattern[m_ParsePointer++]);
 }
 
 void CRegEx::ParseBRE(int stopa,int stopb)
@@ -891,9 +894,9 @@ BOOL wasDollar=FALSE;
 	}
 CString stopstr;
 	if(stopa){
-		stopstr+=stopa;
+		stopstr+=(char*)stopa;
 		if(stopb)
-			stopstr+=stopb;
+			stopstr+=(char*)stopb;
 	}
 	while(m_ParsePointer < m_Pattern.GetLength() && !((m_ParsePointer+1)<m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare(stopstr))){
 		wasDollar = ParseBREexp(first);
@@ -943,11 +946,11 @@ int c = m_Pattern[m_ParsePointer++];
 		subno=m_Subexps;
 		m_ParseParens.SetAtGrow(m_Subexps,CParenthesis(m_Strip.GetSize()));
 		m_Error || m_Strip.Add(CSop(CSop::opLeftParen,subno));
-		if(m_ParsePointer<m_Pattern.GetLength() && !((m_ParsePointer+1)<m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare("\\)")))
+		if(m_ParsePointer<m_Pattern.GetLength() && !((m_ParsePointer+1)<m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare(_T("\\)"))))
 			ParseBRE('\\',')');
 		VERIFY(m_ParseParens[m_Subexps].m_End = m_Strip.GetSize());
 		m_Error || m_Strip.Add(CSop(CSop::opRightParen,subno));
-		if((m_ParsePointer+1) < m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare("\\)"))
+		if((m_ParsePointer+1) < m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare(_T("\\)")))
 			m_ParsePointer+=2;
 		else{
 			m_Error || (m_Error=regeParen);
@@ -1002,7 +1005,7 @@ int c = m_Pattern[m_ParsePointer++];
 		m_Error || m_Strip.Add(CSop(CSop::opPlus1,m_Strip.GetSize()-pos));
 		StripInsert(pos,CSop(CSop::opQuest0,m_Strip.GetSize()-pos+1));
 		m_Error || m_Strip.Add(CSop(CSop::opQuest1,m_Strip.GetSize()-pos));
-	}else if ((m_ParsePointer+1)<m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare("\\{")){
+	}else if ((m_ParsePointer+1)<m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare(_T("\\{"))){
 		m_ParsePointer+=2;
 	int count = ParseCount();
 	int count2;
@@ -1019,8 +1022,8 @@ int c = m_Pattern[m_ParsePointer++];
 		}else // Single number
 			count2=count;
 		EmitRepeat(pos,count,count2);
-		if((m_ParsePointer+1)>=m_Pattern.GetLength() || m_Pattern.Mid(m_ParsePointer,2).Compare("\\}")){
-			while(m_ParsePointer<m_Pattern.GetLength() && !((m_ParsePointer+1)<m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare("\\}")))
+		if((m_ParsePointer+1)>=m_Pattern.GetLength() || m_Pattern.Mid(m_ParsePointer,2).Compare(_T("\\}"))){
+			while(m_ParsePointer<m_Pattern.GetLength() && !((m_ParsePointer+1)<m_Pattern.GetLength() && !m_Pattern.Mid(m_ParsePointer,2).Compare(_T("\\}"))))
 				m_ParsePointer++;
 			if(m_ParsePointer>=m_Pattern.GetLength()){
 				m_Error || (m_Error=regeBrace);
@@ -1450,7 +1453,8 @@ LPCTSTR CRegEx::MatchBackRef(LPCTSTR begin,LPCTSTR end,int from,int to,int level
 LPCTSTR sp = begin;
 BOOL hard = FALSE;
 	// Get as far as we can as long as it's easy
-	for(int ss=from;!hard && ss<to;ss++){
+    int ss = from;
+	for(;!hard && ss<to;ss++){
 	CSop s = m_Strip[ss];
 		switch(s.m_Operator){
 		case CSop::opChar:
@@ -1463,7 +1467,7 @@ BOOL hard = FALSE;
 			sp++;	// I'm sure this ++ could be embedded in previous expression..
 			break;
 		case CSop::opAnyOf:
-			if(sp==end || !m_Sets[s.m_Operand].IsIn(*sp++))
+			if(sp==end || !m_Sets[s.m_Operand].IsIn((UCHAR)*sp++))
 				return NULL;
 			break;
 		case CSop::opBOL:

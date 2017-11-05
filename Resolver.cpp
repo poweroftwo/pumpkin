@@ -51,7 +51,7 @@ CString hostName = socket->m_HostName;
 int at = hostName.Find('@');
 	if(at>=0)
 		hostName=hostName.Mid(at+1);
-	m_hAsync=WSAAsyncGetHostByName(m_hWnd,WM_RESOLVED,(LPCTSTR)hostName,(char*)socket->m_ResolveBuff,sizeof(socket->m_ResolveBuff));
+	m_hAsync=WSAAsyncGetHostByName(m_hWnd,WM_RESOLVED,(const char*)(LPCTSTR)hostName,(char*)socket->m_ResolveBuff,sizeof(socket->m_ResolveBuff));
 	ASSERT(m_hAsync);
 	return 0;
 }
@@ -67,5 +67,5 @@ LRESULT CResolver::OnResolved(WPARAM wP,LPARAM lP)
 
 BOOL CResolver::Resolve()
 {
-	return Create(NULL,"PumpKIN-Resolver",WS_CHILD,CRect(0,0,0,0),socket->m_Daddy,0);
+	return Create(NULL,LPCTSTR("PumpKIN-Resolver"),WS_CHILD,CRect(0,0,0,0),socket->m_Daddy,0);
 }

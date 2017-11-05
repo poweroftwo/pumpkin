@@ -87,9 +87,11 @@ void CPropsServer::OnLogfileBrowse()
 {
 	UpdateData(TRUE);
 	CFileDialog cfd(
-		FALSE, ".log", (LPCSTR)m_LogFile,
+		FALSE,
+        _T(".log"), 
+        (LPCTSTR)m_LogFile,
 		OFN_EXPLORER|OFN_HIDEREADONLY|OFN_LONGNAMES|OFN_NOCHANGEDIR|OFN_OVERWRITEPROMPT|OFN_PATHMUSTEXIST,
-		"Log files (*.log)|*.log|All Files (*.*)|*.*||",
+		_T("Log files (*.log)|*.log|All Files (*.*)|*.*||"),
 		this);
 	if(cfd.DoModal()==IDOK) {
 		m_LogFile = cfd.GetPathName();

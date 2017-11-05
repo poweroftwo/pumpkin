@@ -3,11 +3,11 @@
 
 //#define	REVERSEBYTES(w)	MAKEWORD(HIBYTE(w),LOBYTE(w));
 #define	REVERSEBYTES(w) (htons((WORD)w))
-#define	tftpoBSize	"blksize"
-#define	tftpoTSize	"tsize"
-#define	tftpoTOut	"timeout"
+#define	tftpoBSize	(_T("blksize"))
+#define	tftpoTSize	(_T("tsize"))
+#define	tftpoTOut	(_T("timeout"))
 
-#define	tftpoXResume	"x-resume"
+#define	tftpoXResume	_T("x-resume")
 
 struct	tftp	{
 	typedef CMapStringToString tftpOptions;
@@ -185,19 +185,19 @@ struct acl_rule {
  }
 
  void SaveProfile(CWinApp* app,int i) {
-	 CString n; n.Format("%d",i);
-	 app->WriteProfileInt("ACL","op_"+n,op);
-	 app->WriteProfileString("ACL","addr_"+n,str_addr());
-	 app->WriteProfileString("ACL","mask_"+n,str_mask());
-	 app->WriteProfileInt("ACL","target_"+n,target);
+	 CString n; n.Format(_T("%d"),i);
+	 app->WriteProfileInt(LPCTSTR("ACL"),"op_"+n,op);
+	 app->WriteProfileString(LPCTSTR("ACL"),"addr_"+n,str_addr());
+	 app->WriteProfileString(LPCTSTR("ACL"),"mask_"+n,str_mask());
+	 app->WriteProfileInt(LPCTSTR("ACL"),"target_"+n,target);
  }
 
  void LoadProfile(CWinApp* app,int i) {
-	 CString n; n.Format("%d",i);
-	 op=app->GetProfileInt("ACL","op_"+n,-1);
-	 addr=inet_addr(app->GetProfileString("ACL","addr_"+n));
-	 mask=inet_addr(app->GetProfileString("ACL","mask_"+n));
-	 target=app->GetProfileInt("ACL","target_"+n,-1);
+	 CString n; n.Format(_T("%d"),i);
+	 op=app->GetProfileInt(LPCTSTR("ACL"),"op_"+n,-1);
+	 addr=inet_addr((const char*)(LPCTSTR)app->GetProfileString(LPCTSTR("ACL"),"addr_"+n));
+	 mask=inet_addr((const char*)(LPCTSTR)app->GetProfileString(LPCTSTR("ACL"),"mask_"+n));
+	 target=app->GetProfileInt(LPCTSTR("ACL"),"target_"+n,-1);
  }
 
 };
@@ -240,11 +240,11 @@ public:
 		int s=GetSize();
 		for(int i=0;i<s;++i)
 			m_pData[i].SaveProfile(app,i);
-		app->WriteProfileInt("ACL","rules",s);
+		app->WriteProfileInt(LPCTSTR("ACL"), LPCTSTR("rules"),s);
 	}
 	void LoadProfile(CWinApp* app) {
 		RemoveAll();
-		int s=app->GetProfileInt("ACL","rules",0);
+		int s=app->GetProfileInt(LPCTSTR("ACL"),LPCTSTR("rules"),0);
 		for(int i=0;i<s;++i) {
 			acl_rule r;
 			r.LoadProfile(app,i);

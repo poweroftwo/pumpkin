@@ -77,9 +77,9 @@ BOOL CPropsACL::OnInitDialog()
 	
 	CRect lrc; m_ListCtl.GetClientRect(&lrc);
 	long lrcw3 = lrc.Width()/3;
-	m_ListCtl.InsertColumn(0,"IP",LVCFMT_LEFT,lrcw3,subitemIP);
-	m_ListCtl.InsertColumn(1,"netmask",LVCFMT_LEFT,lrcw3,subitemNM);
-	m_ListCtl.InsertColumn(2,"action",LVCFMT_LEFT,lrc.Width()-lrcw3*2,subitemAction);
+	m_ListCtl.InsertColumn(0,_T("IP"),LVCFMT_LEFT,lrcw3,subitemIP);
+	m_ListCtl.InsertColumn(1,_T("netmask"),LVCFMT_LEFT,lrcw3,subitemNM);
+	m_ListCtl.InsertColumn(2,_T("action"),LVCFMT_LEFT,lrc.Width()-lrcw3*2,subitemAction);
 
 	m_UpCtl.SetIcon(AfxGetApp()->LoadIcon(IDI_UP));
 	m_DownCtl.SetIcon(AfxGetApp()->LoadIcon(IDI_DOWN));
@@ -88,8 +88,8 @@ BOOL CPropsACL::OnInitDialog()
 	m_XferCtl.SetItemData(0,tftp::opRRQ);
 	m_XferCtl.SetItemData(1,tftp::opWRQ);
 
-	m_AddrCtl.SetWindowText("192.168.0.0");
-	m_NetmaskCtl.SetWindowText("255.255.255.0");
+	m_AddrCtl.SetWindowText(_T("192.168.0.0"));
+	m_NetmaskCtl.SetWindowText(_T("255.255.255.0"));
 
 	for(int i=0;i<m_rulist.GetSize();++i) {
 		m_ListCtl.InsertItem(i,0);
@@ -220,11 +220,12 @@ UINT CPropsACL::GetRule(acl_rule& r)
 	else{
 		CString t;
 		m_AddrCtl.GetWindowText(t);
-		if(t.IsEmpty() || ( (r.addr=inet_addr((LPCSTR)t))==INADDR_NONE && t!="255.255.255.255") )
+
+        if(t.IsEmpty() || ( (r.addr=inet_addr((const char*)(LPCTSTR)t))==INADDR_NONE && t!=_T("255.255.255.255")) )
 			rv=IDS_INVALID_IP;
 		else{
 			m_NetmaskCtl.GetWindowText(t);
-			if(t.IsEmpty() || ( (r.mask=inet_addr((LPCSTR)t))==INADDR_NONE && t!="255.255.255.255") )
+			if(t.IsEmpty() || ( (r.mask=inet_addr((const char*)(LPCTSTR)t))==INADDR_NONE && t!=_T("255.255.255.255")) )
 				rv=IDS_INVALID_NETMASK;
 			else{
 				r.target=m_RuleCtl.GetTarget();

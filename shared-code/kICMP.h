@@ -31,10 +31,11 @@ static
 		const UINT timeOut=10000,LPINT pStatus=NULL) = 0;
 };
 
+#include "ms_icmp.h"
+
 class CICMPDll : public CICMP {
 	HANDLE	(WINAPI *m_icmpCF)(VOID);
-	BOOL	(WINAPI *m_icmpSE)(HANDLE,ULONG,LPVOID,WORD,
-		PIPINFO,LPVOID,DWORD,DWORD);
+	BOOL	(WINAPI *m_icmpSE)(HANDLE,ULONG,LPVOID,WORD,PIPINFO,LPVOID,DWORD,DWORD);
 	BOOL	(WINAPI *m_icmpCH)(HANDLE);
 public:
 	HINSTANCE m_hICMPDLL;

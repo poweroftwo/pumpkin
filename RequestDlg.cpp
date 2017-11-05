@@ -34,7 +34,7 @@ void CRequestDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	if(!pDX->m_bSaveAndValidate)
-		m_strBSize.Format("%u",m_BSize);
+		m_strBSize.Format(_T("%u"),m_BSize);
 	//{{AFX_DATA_MAP(CRequestDlg)
 	DDX_Control(pDX, IDC_REMOTEFILE, m_RemoteFileCtl);
 	DDX_Control(pDX, IDC_LOCALFILE, m_LocalFileCtl);
@@ -49,7 +49,7 @@ void CRequestDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_CBString(pDX, IDC_BSIZE, m_strBSize);
 	//}}AFX_DATA_MAP
 	if(pDX->m_bSaveAndValidate)
-		m_BSize=atoi(m_strBSize);
+		m_BSize=atoi((const char*)LPCTSTR(m_strBSize));
 }
 
 CString CRequestDlg::m_MRUHost;
@@ -163,7 +163,15 @@ CString otalxHead,otalxAt;
 void CRequestDlg::OnBrowse() 
 {
 	UpdateData(TRUE);
-CFileDialog cfd(m_Put,NULL,m_LocalFile.IsEmpty()?NULL:m_LocalFile,OFN_EXPLORER|OFN_HIDEREADONLY|OFN_PATHMUSTEXIST|(m_Put?OFN_FILEMUSTEXIST:OFN_OVERWRITEPROMPT),NULL,this);
+
+CFileDialog cfd(
+    m_Put,
+    NULL,
+    m_LocalFile.IsEmpty() ? NULL  : (LPCTSTR)m_LocalFile,
+    OFN_EXPLORER|OFN_HIDEREADONLY|OFN_PATHMUSTEXIST|(m_Put?OFN_FILEMUSTEXIST:OFN_OVERWRITEPROMPT),
+    NULL,
+    this);
+
 CString title;
 	title.LoadString(IDS_TITLE_BROWSEFILE);
 	cfd.m_ofn.lpstrTitle=(LPCTSTR)title;

@@ -8,6 +8,8 @@
 * Microsoft discourages its use.
 */
 
+#ifndef __ms_icmp_h__
+#define __ms_icmp_h__
 
 /* Note 2: For the most part, you can refer to RFC 791 for detials on
 * how to fill in values for the IP option information structure. */
@@ -75,3 +77,4 @@ DWORD WINAPI PASCAL IcmpSendEcho(
 	DWORD Timeout /* time in milliseconds to wait for reply */
 );
 
+#endif

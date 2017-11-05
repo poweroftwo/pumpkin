@@ -106,10 +106,10 @@ public:
 		case CBang::bangSpeaker: MessageBeep(0xFFFFFFFF); return NULL;
 		case CBang::bangSystem: MessageBeep(b->system); return NULL;
 		case CBang::bangResource:
-			snd = b->resource;
+			snd = LPCSTR(b->resource);
 			flags|=SND_RESOURCE; break;
 		case CBang::bangWaveform:
-			snd = b->wave;
+			snd = LPCSTR(b->wave);
 			flags|=SND_FILENAME; break;
 #ifdef _DEBUG
 		default:
@@ -119,14 +119,14 @@ public:
 		if(b->m_bLoop)
 			flags|=SND_LOOP;
 	HMODULE hm = AfxGetInstanceHandle();
-		if(!::PlaySound(snd,hm,flags))
+		if(!::PlaySound(LPCWSTR(snd),hm,flags))
 			return NULL;
 		return b->m_bLoop?new CBelling(snd,hm,flags):NULL;
 	}
 	BOOL StopSound(Whistling whistle) {
 		if(!whistle)
 			return FALSE;
-		::PlaySound(whistle->snd,whistle->hm,whistle->flags|SND_PURGE);
+		::PlaySound(LPCWSTR(whistle->snd),whistle->hm,whistle->flags|SND_PURGE);
 		delete whistle;
 		return TRUE;
 	}

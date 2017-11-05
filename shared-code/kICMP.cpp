@@ -1,13 +1,17 @@
 #include "../stdafx.h"
 #include "kICMP.h"
 
+// XXX Biggs
+#include "ms_icmp.h"
+#include "ip_icmp.h"
+
 CICMP::_mechanismus CICMP::m_mechanismus = CICMP::_icmpUndetermined;
 
 BOOL CICMPDll::Initialize()
 {
 	if(m_hICMP!=INVALID_HANDLE_VALUE || m_hICMPDLL)
 		Deinitialize();
-	m_hICMPDLL = ::LoadLibraryEx("ICMP",NULL,0);
+	m_hICMPDLL = ::LoadLibraryEx(_T("ICMP"),NULL,0);
 	if(!m_hICMPDLL)
 		return FALSE;
 	*(FARPROC*)&m_icmpCF = ::GetProcAddress(m_hICMPDLL,"IcmpCreateFile");
@@ -285,7 +289,7 @@ SOCKET testSocket = socket(AF_INET,SOCK_RAW,1);
 		closesocket(testSocket);
 		m_mechanismus=_icmpWinsock;
 	}else{
-	HINSTANCE hICMP = ::LoadLibraryEx("ICMP",NULL,0);
+	HINSTANCE hICMP = ::LoadLibraryEx(_T("ICMP"),NULL,0);
 		if(!hICMP)
 			return;
 	BOOL isThere = (
