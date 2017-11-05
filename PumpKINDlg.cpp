@@ -97,10 +97,10 @@ CPumpKINDlg::CPumpKINDlg(CWnd* pParent /*=NULL*/)
 	m_bShown=TRUE;
 	m_bExiting=FALSE;
 	m_BlockSize=2048;
-	m_bnw.AssignSound(LPCTSTR("(bang)"),IDR_WAVE_RING,CBellsNWhistles::CBang::bangResource);
-	m_bnw.AssignSound(LPCTSTR("(done)"),IDR_WAVE_FINISHED,CBellsNWhistles::CBang::bangResource);
-	m_bnw.AssignSound(LPCTSTR("(oops)"),IDR_WAVE_ABORTED,CBellsNWhistles::CBang::bangResource);
-	m_bnw.AssignSound(LPCTSTR("(none)"),(UINT)0,CBellsNWhistles::CBang::bangNone);
+	m_bnw.AssignSound(_T("(bang)"),IDR_WAVE_RING,CBellsNWhistles::CBang::bangResource);
+	m_bnw.AssignSound(_T("(done)"),IDR_WAVE_FINISHED,CBellsNWhistles::CBang::bangResource);
+	m_bnw.AssignSound(_T("(oops)"),IDR_WAVE_ABORTED,CBellsNWhistles::CBang::bangResource);
+	m_bnw.AssignSound(_T("(none)"),(UINT)0,CBellsNWhistles::CBang::bangNone);
 	m_bnwRequest="(bang)"; m_bnwSuccess="(done)";
 	m_bnwAbort="(oops)";
 	//{{AFX_DATA_INIT(CPumpKINDlg)
@@ -205,7 +205,7 @@ BOOL CPumpKINDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	VERIFY(m_Retrier->Create(NULL,LPCTSTR("PumpKIN-Retrier"),WS_CHILD,CRect(0,0,0,0),this,0));
+	VERIFY(m_Retrier->Create(NULL,_T("PumpKIN-Retrier"),WS_CHILD,CRect(0,0,0,0),this,0));
 
 	m_Images.Create(16,16,TRUE,2,1);
 	m_iRRQ = m_Images.Add(AfxGetApp()->LoadIcon(IDI_RRQ));
@@ -369,7 +369,7 @@ int CPumpKINDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		AfxMessageBox(IDS_BOX_CANTBIND,MB_OK|MB_ICONEXCLAMATION);
 	}
 
-	if(!m_Trayer->Create(NULL,LPCTSTR("PumpKIN TrayIcon"),WS_CHILD,CRect(0,0,0,0),this,0)){
+	if(!m_Trayer->Create(NULL,_T("PumpKIN TrayIcon"),WS_CHILD,CRect(0,0,0,0),this,0)){
 		TRACE0("Failed to create trayer\n");
 		return -1;
 	}

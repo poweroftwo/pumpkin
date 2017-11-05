@@ -186,18 +186,18 @@ struct acl_rule {
 
  void SaveProfile(CWinApp* app,int i) {
 	 CString n; n.Format(_T("%d"),i);
-	 app->WriteProfileInt(LPCTSTR("ACL"),"op_"+n,op);
-	 app->WriteProfileString(LPCTSTR("ACL"),"addr_"+n,str_addr());
-	 app->WriteProfileString(LPCTSTR("ACL"),"mask_"+n,str_mask());
-	 app->WriteProfileInt(LPCTSTR("ACL"),"target_"+n,target);
+	 app->WriteProfileInt(_T("ACL"),"op_"+n,op);
+	 app->WriteProfileString(_T("ACL"),"addr_"+n,str_addr());
+	 app->WriteProfileString(_T("ACL"),"mask_"+n,str_mask());
+	 app->WriteProfileInt(_T("ACL"),"target_"+n,target);
  }
 
  void LoadProfile(CWinApp* app,int i) {
 	 CString n; n.Format(_T("%d"),i);
-	 op=app->GetProfileInt(LPCTSTR("ACL"),"op_"+n,-1);
-	 addr=inet_addr((const char*)(LPCTSTR)app->GetProfileString(LPCTSTR("ACL"),"addr_"+n));
-	 mask=inet_addr((const char*)(LPCTSTR)app->GetProfileString(LPCTSTR("ACL"),"mask_"+n));
-	 target=app->GetProfileInt(LPCTSTR("ACL"),"target_"+n,-1);
+	 op=app->GetProfileInt(_T("ACL"),"op_"+n,-1);
+	 addr=inet_addr((const char*)(LPCTSTR)app->GetProfileString(_T("ACL"),"addr_"+n));
+	 mask=inet_addr((const char*)(LPCTSTR)app->GetProfileString(_T("ACL"),"mask_"+n));
+	 target=app->GetProfileInt(_T("ACL"),"target_"+n,-1);
  }
 
 };
@@ -240,11 +240,11 @@ public:
 		int s=GetSize();
 		for(int i=0;i<s;++i)
 			m_pData[i].SaveProfile(app,i);
-		app->WriteProfileInt(LPCTSTR("ACL"), LPCTSTR("rules"),s);
+		app->WriteProfileInt(_T("ACL"), _T("rules"),s);
 	}
 	void LoadProfile(CWinApp* app) {
 		RemoveAll();
-		int s=app->GetProfileInt(LPCTSTR("ACL"),LPCTSTR("rules"),0);
+		int s=app->GetProfileInt(_T("ACL"),_T("rules"),0);
 		for(int i=0;i<s;++i) {
 			acl_rule r;
 			r.LoadProfile(app,i);
