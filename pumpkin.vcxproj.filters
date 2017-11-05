@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ACLTargetCombo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfirmRRQDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfirmWRQDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropsACL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropsNetwork.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropsServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropsSounds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pumpkin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PumpKINDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RequestDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Resolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Retrier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Trayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared-code\kICMP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shared-code\RegEx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ACLTargetCombo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfirmRRQDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfirmWRQDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropsACL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropsNetwork.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropsServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropsSounds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pumpkin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PumpKINDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RequestDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Retrier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Trayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared-code\BellsNWhistles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared-code\BitSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared-code\BTreendex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared-code\Dynamide.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared-code\FindIFace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared-code\install.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared-code\ip_icmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared-code\kHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared-code\kICMP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared-code\LRUCache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared-code\ms_icmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared-code\RegEx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared-code\SNMPeer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared-code\SNMPExtDll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shared-code\SNMPOIDs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="pumpkin.clw" />
+    <None Include="shared-code\kinhelp.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="pumpkin.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
