@@ -602,7 +602,6 @@ SOCKADDR_IN sin;
 	if(!p->Receive(this,fionread,&sin)){
 		m_Daddy->LogLine(IDS_LOG_XFERUDPRECEIVE);
 		delete p;
-		return;
 	}else
 		if(m_Peer.sin_addr.s_addr==INADDR_NONE){
 			m_Peer.sin_addr=sin.sin_addr;
@@ -1229,7 +1228,6 @@ CPropsACL acl;
 	server.m_LogFile=m_LogFile;
 
 	network.m_ListenPort=m_ListenPort;
-	network.m_ListenAddress=m_ListenAddress;
 	network.m_SpeakPort=m_SpeakPort;
 	network.m_TimeOut= (UINT)m_TFTPTimeOut.GetTotalSeconds();
 	network.m_BlockSize=m_BlockSize;
@@ -1253,7 +1251,6 @@ CPropsACL acl;
 		m_LogFile=server.m_LogFile;
 
 		m_ListenPort=network.m_ListenPort;
-		m_ListenAddress=network.m_ListenAddress;
 		m_SpeakPort=network.m_SpeakPort;
 		m_TFTPTimeOut=CTimeSpan(network.m_TimeOut);
 		m_BlockSize=network.m_BlockSize;
@@ -1892,7 +1889,6 @@ CWinApp *app = AfxGetApp();
 	m_bnwAbort=app->GetProfileString(_T("BellsNWhistles"),_T("Abort"),m_bnwAbort);
 	m_bTFTPSubdirs=app->GetProfileInt(_T("TFTPSettings"),_T("Subdirs"),m_bTFTPSubdirs);
 	m_ListenPort=app->GetProfileInt(_T("TFTPSettings"),_T("ListenPort"),m_ListenPort);
-	m_ListenAddress=app->GetProfileString(_T("TFTPSettings"),_T("ListenAddress"),m_ListenAddress);
 	m_LogLength=app->GetProfileInt(_T("UISettings"),_T("LogLength"),m_LogLength);
 	m_PromptTimeOut=app->GetProfileInt(_T("UISettings"),_T("PromptTimeout"),m_PromptTimeOut);
 	m_RRQMode=app->GetProfileInt(_T("TFTPSettings"),_T("RRQMode"),m_RRQMode);
@@ -1923,7 +1919,6 @@ CWinApp *app = AfxGetApp();
 	app->WriteProfileString(_T("BellsNWhistles"),_T("Abort"),m_bnwAbort);
 	app->WriteProfileInt(_T("TFTPSettings"),_T("Subdirs"),m_bTFTPSubdirs);
 	app->WriteProfileInt(_T("TFTPSettings"),_T("ListenPort"),m_ListenPort);
-	app->WriteProfileString(_T("TFTPSettings"),_T("ListenAddress"),m_ListenAddress);
 	app->WriteProfileInt(_T("UISettings"),_T("LogLength"),m_LogLength);
 	app->WriteProfileInt(_T("UISettings"),_T("PromptTimeout"),m_PromptTimeOut);
 	app->WriteProfileInt(_T("TFTPSettings"),_T("RRQMode"),m_RRQMode);
@@ -2086,14 +2081,16 @@ void CPumpKINDlg::OnHelp()
 
 BOOL CListenSocket::SetListen(BOOL b) {
 	ASSERT(m_Daddy);
-	if(b==m_bListen) return TRUE;
-	if(!b) {
+	if(b==m_bListen)
+		return TRUE;
+	if(b) {
+		if(!Create(m_Daddy->m_ListenPort,SOCK_DGRAM))
+			return FALSE;
+		return m_bListen=TRUE;
+	}else{
 		Close(); m_bListen=FALSE;
 		return TRUE;
 	}
-	return m_bListen=Create(m_Daddy->m_ListenPort,SOCK_DGRAM,
-		FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT|FD_CLOSE,
-		m_Daddy->m_ListenAddress.IsEmpty()?NULL:(LPCTSTR)m_Daddy->m_ListenAddress);
 }
 
 void CPumpKINDlg::OnListening() 
