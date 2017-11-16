@@ -863,6 +863,10 @@ tftp *p = tftp::Allocate(tftp::tftpDATA::tftpSize(m_blkSize));
 		PostTFTP(p);
 		if(bytes < (int)m_blkSize){
 			state=stateClosing; m_ACKtoClose = m_ACK+1;
+            
+            // XXX Biggs added, decrementing length on last transmitted block
+            p->length--;
+
 		}
 	}CATCH(CFileException,e){
 		Deny(e);
