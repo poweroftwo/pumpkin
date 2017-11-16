@@ -409,7 +409,7 @@ SOCKADDR_IN sin;
 	}
 #ifndef	NDEBUG
     CString tmp;
-	tmp.Format(_T("%u - %s - %u\n"),tftpRQ->Opcode(),inet_ntoa(sin.sin_addr),sin.sin_port);
+	tmp.Format(_T("%u - %s - %u\n"),tftpRQ->Opcode(),CString(inet_ntoa(sin.sin_addr)),sin.sin_port);
     // XXX Biggs
     //TRACE0(tmp);
 #endif
@@ -430,7 +430,7 @@ POSITION p = m_Daddy->m_Xfers.GetStartPosition();
 		// Read Request
 		{
 		CString tmp;
-			tmp.Format(IDS_LOG_RRQSERVE,tftpRQ->rqFileName(),tftpRQ->rqType(),inet_ntoa(sin.sin_addr));
+			tmp.Format(IDS_LOG_RRQSERVE,tftpRQ->rqFileName(),tftpRQ->rqType(),CString(inet_ntoa(sin.sin_addr)));
 			m_Daddy->LogLine(tmp);
 		CRRQSocket *s = new CRRQSocket(m_Daddy,tftpRQ->rqFileName(),tftpRQ->rqType(),&sin);
 			ASSERT(s);
@@ -443,7 +443,7 @@ POSITION p = m_Daddy->m_Xfers.GetStartPosition();
 		// Write Request
 		{
 		CString tmp;
-			tmp.Format(IDS_LOG_WRQSERVE,tftpRQ->rqFileName(),tftpRQ->rqType(),inet_ntoa(sin.sin_addr));
+			tmp.Format(IDS_LOG_WRQSERVE,tftpRQ->rqFileName(),tftpRQ->rqType(),CString(inet_ntoa(sin.sin_addr)));
 			m_Daddy->LogLine(tmp);
 		CWRQSocket *s = new CWRQSocket(m_Daddy,tftpRQ->rqFileName(),tftpRQ->rqType(),&sin);
 			ASSERT(s);
@@ -487,7 +487,7 @@ CString tftp::rqFileName()
 	ASSERT(Opcode()==opRRQ || Opcode()==opWRQ);
 CString rv;
 	if(memchr(&data.m_RQ.data,0,length-sizeof(opcode)))
-		rv = (LPCTSTR)data.m_RQ.data;
+		rv = CString(data.m_RQ.data);
 	return rv;
 }
 
@@ -498,7 +498,7 @@ CString tftp::rqType()
 CString rv;
 char *tmp = (char*)memchr(&data.m_RQ.data,0,length-sizeof(opcode));
 	if(tmp++)
-		rv = (LPCTSTR)tmp;
+		rv = CString(tmp);
 	return rv;
 }
 
@@ -1272,7 +1272,7 @@ BOOL CRRQSocket::ConfirmRequest()
 CConfirmRRQDlg cd(NULL);
 	cd.m_Daddy=this;
 	cd.m_File=m_FileName;
-	cd.m_Host=inet_ntoa(m_Peer.sin_addr);
+	cd.m_Host=CString(inet_ntoa(m_Peer.sin_addr));
 	if(cd.DoModal()==IDOK)
 		return TRUE;
 	return FALSE;
@@ -1439,7 +1439,7 @@ BOOL CWRQSocket::ConfirmRequest()
 CConfirmWRQDlg cd(NULL);
 	cd.m_Daddy=this;
 	cd.m_File=m_FileName;
-	cd.m_Host=inet_ntoa(m_Peer.sin_addr);
+	cd.m_Host=CString(inet_ntoa(m_Peer.sin_addr));
 	switch(cd.DoModal()){
 	case IDOK:
 		m_Rename=FALSE;
