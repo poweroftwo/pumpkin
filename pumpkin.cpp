@@ -55,9 +55,9 @@ BOOL CPumpKINApp::InitInstance()
 #endif
 
 	SetRegistryKey(IDS_REGISTRYKEY);
-	m_HelpFile = m_pszHelpFilePath;
+    m_HelpFile = m_pszHelpFilePath;
 	m_HelpFile+=">Standard";
-	m_pszHelpFilePath=(LPCTSTR)m_HelpFile;
+	m_pszHelpFilePath=_tcsdup((LPCTSTR)m_HelpFile);
 
 	CPumpKINDlg dlg;
 	m_pMainWnd = &dlg;
