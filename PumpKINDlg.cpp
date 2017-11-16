@@ -383,7 +383,8 @@ NOTIFYICONDATA nid;
 	nid.uCallbackMessage=WM_TRAYICON;
 	nid.hIcon=AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	// *** Load from resource
-	strcpy_s((char*)nid.szTip, sizeof nid.szTip, "PumpKIN");
+    wcscpy_s(nid.szTip, sizeof nid.szTip, _T("PumpKIN"));
+
 	VERIFY(Shell_NotifyIcon(NIM_ADD,&nid));
 
 	return 0;
@@ -648,7 +649,8 @@ int i = m_Daddy->m_List.FindItem(&lvf);
 	}
 	m_Daddy->m_List.SetItemText(i,CPumpKINDlg::subitemFile,m_FileName);
 	m_Daddy->m_List.SetItemText(i,CPumpKINDlg::subitemType,m_Type);
-	m_Daddy->m_List.SetItemText(i,CPumpKINDlg::subitemPeer,LPCTSTR(inet_ntoa(m_Peer.sin_addr)));
+    m_Daddy->m_List.SetItemText(i,CPumpKINDlg::subitemPeer, CString(inet_ntoa(m_Peer.sin_addr)));
+
 CString tmp;
 	tmp.Format(IDS_FMT_BYTES,GetACK());
 	m_Daddy->m_List.SetItemText(i,CPumpKINDlg::subitemBytes,tmp);
@@ -748,7 +750,7 @@ CFileException e;
 	int at = inAddr.Find('@');
 		if(at>=0)
 			inAddr=inAddr.Mid(at+1);
-		if((m_Peer.sin_addr.s_addr=inet_addr((const char*)LPCTSTR(inAddr)))==INADDR_NONE){
+		if((m_Peer.sin_addr.s_addr=inet_addr(CT2CA(inAddr)))==INADDR_NONE){
 			ASSERT(!m_wndResolver);
 			m_wndResolver = new CResolver(this);
 			ASSERT(m_wndResolver);
@@ -760,7 +762,7 @@ CFileException e;
 	tftp::tftpOptions o;
 	CString v;
 		if(m_Options.Lookup(LPCTSTR(tftpoBSize),v)){
-			m__blkSize=atoi((const char*)LPCTSTR(v));
+			m__blkSize=atoi(CT2CA(v));
 			if(m__blkSize){
 				m_blkSize=m__blkSize;
 				v.Format(_T("%u"),m_blkSize);
@@ -772,7 +774,7 @@ CFileException e;
 			o[tftpoTSize]=v;
 		}
 		if(m_Options.Lookup(tftpoTOut,v)){
-			m__timeOut=atoi((const char*)LPCTSTR(v));
+			m__timeOut=atoi(CT2CA(v));
 			if(m__timeOut){
 				m_timeOut=m__timeOut;
 				v.Format(_T("%u"),m_timeOut);
@@ -807,7 +809,7 @@ CRRQSocket::CRRQSocket(CPumpKINDlg *daddy,LPCTSTR fileName,LPCTSTR type,SOCKADDR
 
 UINT tftp::tftpERROR::tftpSize(LPCTSTR msg)
 {
-	return tftpHdrSize-tftpSlackSize+sizeof(tftp::tftpERROR::tftpErrorCode)+strlen((const char*)msg)+1;
+	return tftpHdrSize-tftpSlackSize+sizeof(tftp::tftpERROR::tftpErrorCode)+strlen(CT2CA(msg))+1;
 }
 
 tftp* tftp::Allocate(UINT tftpSize)
@@ -823,7 +825,7 @@ void tftp::errSet(UINT code,LPCTSTR msg)
 {
 	ASSERT(this);
 	ASSERT(length>=data.m_ERROR.tftpSize(msg));
-	strcpy_s((char*)data.m_ERROR.data,sizeof data.m_ERROR.data, (const char*)msg);
+	strcpy((char*)data.m_ERROR.data,CT2CA(msg));
 	data.m_ERROR.SetCode(code);
 }
 
@@ -943,7 +945,7 @@ BOOL rv = TRUE;
 			if(p->GetOptions(&o)){
 			CString v;
 				if(o.Lookup(tftpoBSize,v)){
-					m_blkSize=atoi((const char*)LPCTSTR(v));
+					m_blkSize=atoi(CT2CA(v));
 					if(!m_blkSize){	// *** More sanity checks
 						Deny(tftp::errOption,IDS_TFTP_ERROR_BSIZE);
 						rv = TRUE;
@@ -951,7 +953,7 @@ BOOL rv = TRUE;
 					}
 				}
 				if(o.Lookup(tftpoTOut,v)){
-					m_timeOut=atoi((const char*)LPCTSTR(v));
+					m_timeOut=atoi(CT2CA(v));
 					if(!m_timeOut){	// *** More sanity checks
 						Deny(tftp::errOption,IDS_TFTP_ERROR_TOUT);
 						rv = TRUE;
@@ -959,7 +961,7 @@ BOOL rv = TRUE;
 					}
 				}
 				if(o.Lookup(tftpoXResume,v)){
-					m_ACK=atoi((const char*)LPCTSTR(v));
+					m_ACK=atoi(CT2CA(v));
 				}
 			}
 			UpdateList();
@@ -1018,21 +1020,21 @@ BOOL CWRQSocket::OnTFTP(tftp* p)
 		if(p->GetOptions(&o)){
 		CString v;
 			if(o.Lookup(tftpoBSize,v)){
-				m_blkSize=atoi((const char*)LPCTSTR(v));
+				m_blkSize=atoi(CT2CA(v));
 				if(!m_blkSize){	// *** More sanity checks
 					Deny(tftp::errOption,IDS_TFTP_ERROR_BSIZE);
 					return TRUE;
 				}
 			}
 			if(o.Lookup(tftpoTOut,v)){
-				m_timeOut=atoi((const char*)LPCTSTR(v));
+				m_timeOut=atoi(CT2CA(v));
 				if(!m_timeOut){	// *** More sanity checks
 					Deny(tftp::errOption,IDS_TFTP_ERROR_TOUT);
 					return TRUE;
 				}
 			}
 			if(o.Lookup(tftpoTSize,v)){
-				m_xferSize=atoi((const char*)LPCTSTR(v));
+				m_xferSize=atoi(CT2CA(v));
 			}
 			if(m_xferSize>=0 && m_xferSize>=(LONG)(m_blkSize<<16)) {
 				Deny(tftp::errUndefined,IDS_TFTP_ERROR_TOOBIG);
@@ -1371,7 +1373,8 @@ CFileException e;
 	int at = inAddr.Find('@');
 		if(at>=0)
 			inAddr=inAddr.Mid(at+1);
-		if((m_Peer.sin_addr.s_addr=inet_addr((const char*)(LPCTSTR)inAddr))==INADDR_NONE){
+        
+        if((m_Peer.sin_addr.s_addr=inet_addr(CT2CA(inAddr)))==INADDR_NONE){
 			ASSERT(!m_wndResolver);
 			m_wndResolver = new CResolver(this);
 			ASSERT(m_wndResolver);
@@ -1391,7 +1394,7 @@ tftp::tftpOptions oack;
 		}
 	}
 	if(m_Options.Lookup(tftpoBSize,v)){
-		m_blkSize=atoi((const char*)LPCTSTR(v));
+		m_blkSize=atoi(CT2CA(v));
 		if(!m_blkSize){	//  *** Do more about sanity check
 			Deny(tftp::errOption,IDS_TFTP_ERROR_BSIZE);
 			return TRUE;
@@ -1400,7 +1403,7 @@ tftp::tftpOptions oack;
 		oack[tftpoBSize]=v;
 	}
 	if(m_Options.Lookup(tftpoTOut,v)){
-		m_timeOut=atoi((const char*)LPCTSTR(v));
+		m_timeOut=atoi(CT2CA(v));
 		if(!m_timeOut){	// *** Do more about sanity check
 			Deny(tftp::errOption,IDS_TFTP_ERROR_TOUT);
 			return TRUE;
@@ -1687,7 +1690,7 @@ tftp	*p = tftp::Allocate(tftp::tftpWRQ::tftpSize(m_FileName,m_Type,&o));
 
 UINT tftp::tftpRQ::tftpSize(LPCTSTR file,LPCTSTR type,tftp::tftpOptions* ops)
 {
-UINT rv = tftpHdrSize-tftpSlackSize+strlen((const char *)file)+1+strlen((const char*)type)+1;
+UINT rv = tftpHdrSize-tftpSlackSize+strlen(CT2CA(file))+1+strlen(CT2CA(type))+1;
 	if(ops){
 	tftpOptions& o = *ops;
 	POSITION p = o.GetStartPosition();
@@ -1725,41 +1728,34 @@ void tftp::tftpRQ::Set(LPCTSTR file,LPCTSTR type,tftp::tftpOptions* ops)
 {
 	// MAY BE DANGEROUS!
 UINT ptr = 0;
-	strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)file); 
-    ptr+=strlen((const char*)file)+1;
-	strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)type); 
-    ptr+=strlen((const char*)type)+1;
+	strcpy((char*)(LPTSTR)&data[ptr],CT2CA(file)); ptr+=strlen(CT2CA(file))+1;
+	strcpy((char*)(LPTSTR)&data[ptr],CT2CA(type)); ptr+=strlen(CT2CA(type))+1;
 	if(ops){
 	tftpOptions& o = *ops;
 	POSITION p = o.GetStartPosition();
 		while(p){
 		CString n,v;
 			o.GetNextAssoc(p,n,v);
-			strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)n); 
-            ptr+=n.GetLength()+1;
-			strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)v); 
-            ptr+=v.GetLength()+1;
+			strcpy((char*)(LPTSTR)&data[ptr],CT2CA(n)); ptr+=n.GetLength()+1;
+			strcpy((char*)(LPTSTR)&data[ptr],CT2CA(v)); ptr+=v.GetLength()+1;
 		}
 	}
 }
+
 void tftp::tftpRRQ::Set(LPCTSTR file,LPCTSTR type,tftp::tftpOptions* ops)
 {
 	// MAY BE DANGEROUS!
 UINT ptr = 0;
-	strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)file); 
-    ptr+=strlen((char*)file)+1;
-	strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)type);
-    ptr+=strlen((char*)type)+1;
+    strcpy((char*)(LPTSTR)&data[ptr],CT2CA(file)); ptr+=strlen(CT2CA(file))+1;
+	strcpy((char*)(LPTSTR)&data[ptr],CT2CA(type)); ptr+=strlen(CT2CA(type))+1;
 	if(ops){
 	tftpOptions& o = *ops;
 	POSITION p = o.GetStartPosition();
 		while(p){
 		CString n,v;
 			o.GetNextAssoc(p,n,v);
-			strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)n); 
-            ptr+=n.GetLength()+1;
-			strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)v); 
-            ptr+=v.GetLength()+1;
+			strcpy((char*)(LPTSTR)&data[ptr],CT2CA(n)); ptr+=n.GetLength()+1;
+			strcpy((char*)(LPTSTR)&data[ptr],CT2CA(v)); ptr+=v.GetLength()+1;
 		}
 	}
 }
@@ -1767,23 +1763,20 @@ void tftp::tftpWRQ::Set(LPCTSTR file,LPCTSTR type,tftp::tftpOptions* ops)
 {
 	// MAY BE DANGEROUS!
 UINT ptr = 0;
-	strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)file); 
-    ptr+=strlen((char*)file)+1;
-	strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)type); 
-    ptr+=strlen((char*)type)+1;
+	strcpy((char*)(LPTSTR)&data[ptr],CT2CA(file)); ptr+=strlen(CT2CA(file))+1;
+	strcpy((char*)(LPTSTR)&data[ptr],CT2CA(type)); ptr+=strlen(CT2CA(type))+1;
 	if(ops){
 	tftpOptions& o = *ops;
 	POSITION p = o.GetStartPosition();
 		while(p){
 		CString n,v;
 			o.GetNextAssoc(p,n,v);
-			strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)n); 
-            ptr+=n.GetLength()+1;
-			strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)v); 
-            ptr+=v.GetLength()+1;
+			strcpy((char*)(LPTSTR)&data[ptr],CT2CA(n)); ptr+=n.GetLength()+1;
+			strcpy((char*)(LPTSTR)&data[ptr],CT2CA(v)); ptr+=v.GetLength()+1;
 		}
 	}
 }
+
 void tftp::tftpOACK::Set(tftpOptions* ops)
 {
 	ASSERT(ops);
@@ -1793,10 +1786,8 @@ POSITION p = o.GetStartPosition();
 	while(p){
 	CString n,v;
 		o.GetNextAssoc(p,n,v);
-		strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)n); 
-        ptr+=n.GetLength()+1;
-		strcpy_s((char*)(LPTSTR)&data[ptr], sizeof &data[ptr], (char*)(LPCTSTR)v); 
-        ptr+=v.GetLength()+1;
+		strcpy((char*)(LPTSTR)&data[ptr],CT2CA(n)); ptr+=n.GetLength()+1;
+		strcpy((char*)(LPTSTR)&data[ptr],CT2CA(v)); ptr+=v.GetLength()+1;
 	}
 }
 

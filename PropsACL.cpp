@@ -221,11 +221,11 @@ UINT CPropsACL::GetRule(acl_rule& r)
 		CString t;
 		m_AddrCtl.GetWindowText(t);
 
-        if(t.IsEmpty() || ( (r.addr=inet_addr((const char*)(LPCTSTR)t))==INADDR_NONE && t!=_T("255.255.255.255")) )
+        if(t.IsEmpty() || ( (r.addr=inet_addr(CT2CA(t)))==INADDR_NONE && t!=_T("255.255.255.255")) )
 			rv=IDS_INVALID_IP;
 		else{
 			m_NetmaskCtl.GetWindowText(t);
-			if(t.IsEmpty() || ( (r.mask=inet_addr((const char*)(LPCTSTR)t))==INADDR_NONE && t!=_T("255.255.255.255")) )
+			if(t.IsEmpty() || ( (r.mask=inet_addr(CT2CA(t)))==INADDR_NONE && t!=_T("255.255.255.255")) )
 				rv=IDS_INVALID_NETMASK;
 			else{
 				r.target=m_RuleCtl.GetTarget();

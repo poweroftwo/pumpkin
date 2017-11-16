@@ -49,7 +49,7 @@ void CRequestDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_CBString(pDX, IDC_BSIZE, m_strBSize);
 	//}}AFX_DATA_MAP
 	if(pDX->m_bSaveAndValidate)
-		m_BSize=atoi((const char*)LPCTSTR(m_strBSize));
+		m_BSize=atoi(CT2CA(m_strBSize));
 }
 
 CString CRequestDlg::m_MRUHost;

@@ -195,8 +195,8 @@ struct acl_rule {
  void LoadProfile(CWinApp* app,int i) {
 	 CString n; n.Format(_T("%d"),i);
 	 op=app->GetProfileInt(_T("ACL"),"op_"+n,-1);
-	 addr=inet_addr((const char*)(LPCTSTR)app->GetProfileString(_T("ACL"),"addr_"+n));
-	 mask=inet_addr((const char*)(LPCTSTR)app->GetProfileString(_T("ACL"),"mask_"+n));
+	 addr=inet_addr(CT2CA(app->GetProfileString(_T("ACL"),"addr_"+n)));
+	 mask=inet_addr(CT2CA(app->GetProfileString(_T("ACL"),"mask_"+n)));
 	 target=app->GetProfileInt(_T("ACL"),"target_"+n,-1);
  }
 
